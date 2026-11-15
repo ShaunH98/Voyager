@@ -127,3 +127,8 @@ debug_*
 logs/
 plot_iter.py
 *.svg
+# local secrets / runs
+.env
+ckpt_task/
+logs/
+.venv/

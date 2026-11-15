@@ -11,6 +11,7 @@ from .agents import ActionAgent
 from .agents import CriticAgent
 from .agents import CurriculumAgent
 from .agents import SkillManager
+from .llm import METER, PEAK, BudgetExceeded
 
 
 # TODO: remove event memory
@@ -21,27 +22,30 @@ class Voyager:
         azure_login: Dict[str, str] = None,
         server_port: int = 3000,
         openai_api_key: str = None,
+        provider: str = None,
+        budget_usd: float = None,
+        peak_guard: bool = False,
         env_wait_ticks: int = 20,
         env_request_timeout: int = 600,
         max_iterations: int = 160,
         reset_placed_if_failed: bool = False,
-        action_agent_model_name: str = "gpt-4",
+        action_agent_model_name: str = None,
         action_agent_temperature: float = 0,
         action_agent_task_max_retries: int = 4,
         action_agent_show_chat_log: bool = True,
         action_agent_show_execution_error: bool = True,
-        curriculum_agent_model_name: str = "gpt-4",
+        curriculum_agent_model_name: str = None,
         curriculum_agent_temperature: float = 0,
-        curriculum_agent_qa_model_name: str = "gpt-3.5-turbo",
+        curriculum_agent_qa_model_name: str = None,
         curriculum_agent_qa_temperature: float = 0,
         curriculum_agent_warm_up: Dict[str, int] = None,
         curriculum_agent_core_inventory_items: str = r".*_log|.*_planks|stick|crafting_table|furnace"
         r"|cobblestone|dirt|coal|.*_pickaxe|.*_sword|.*_axe",
         curriculum_agent_mode: str = "auto",
-        critic_agent_model_name: str = "gpt-4",
+        critic_agent_model_name: str = None,
         critic_agent_temperature: float = 0,
         critic_agent_mode: str = "auto",
-        skill_manager_model_name: str = "gpt-3.5-turbo",
+        skill_manager_model_name: str = None,
         skill_manager_temperature: float = 0,
         skill_manager_retrieval_top_k: int = 5,
         openai_api_request_timeout: int = 240,
@@ -58,7 +62,10 @@ class Voyager:
         :param mc_port: minecraft in-game port
         :param azure_login: minecraft login config
         :param server_port: mineflayer port
-        :param openai_api_key: openai api key
+        :param openai_api_key: openai api key (only for provider="openai"; otherwise use env vars / .env)
+        :param provider: deepseek (default) | openai | openrouter | ollama; model names default per provider
+        :param budget_usd: stop the run once estimated LLM spend reaches this many US dollars
+        :param peak_guard: pause LLM calls Mon-Fri 11:30-14:30 and 16:30-20:30 Adelaide time
         :param env_wait_ticks: how many ticks at the end each step will wait, if you found some chat log missing,
         you should increase this value
         :param env_request_timeout: how many seconds to wait for each step, if the code execution exceeds this time,
@@ -112,7 +119,13 @@ class Voyager:
         self.max_iterations = max_iterations
 
         # set openai api key
-        os.environ["OPENAI_API_KEY"] = openai_api_key
+        if openai_api_key:
+            os.environ["OPENAI_API_KEY"] = openai_api_key
+        if provider:
+            os.environ["VOYAGER_PROVIDER"] = provider
+        U.f_mkdir(ckpt_dir)
+        METER.attach(f"{ckpt_dir}/usage.json", budget_usd, resume)
+        PEAK.__init__(enabled=peak_guard)
 
         # init agents
         self.action_agent = ActionAgent(
@@ -330,6 +343,8 @@ class Voyager:
                     context=context,
                     reset_env=reset_env,
                 )
+            except BudgetExceeded:
+                raise
             except Exception as e:
                 time.sleep(3)  # wait for mineflayer to exit
                 info = {
@@ -360,6 +375,7 @@ class Voyager:
             print(
                 f"\033[35mFailed tasks: {', '.join(self.curriculum_agent.failed_tasks)}\033[0m"
             )
+            print(f"\033[36m[usage] {METER.line()}\033[0m")
 
         return {
             "completed_tasks": self.curriculum_agent.completed_tasks,

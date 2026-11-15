@@ -1,3 +1,41 @@
+# Voyager (fork): runs on DeepSeek or any OpenAI-compatible model
+
+This fork updates the 2023 research code so it installs and runs today, cheaply.
+
+| Change | Why |
+|---|---|
+| **No more langchain / chromadb / OpenAI lock-in.** New `voyager/llm.py` talks to any OpenAI-compatible API: DeepSeek (default), OpenAI, OpenRouter, local Ollama. | The old langchain 0.0.x imports no longer work, and GPT-4 is expensive. |
+| **Local, free skill search.** `voyager/vectorstore.py` uses a small on-CPU embedding model (fastembed, bge-small) and a JSON file instead of OpenAI embeddings + chromadb. | DeepSeek has no embeddings API; chromadb 0.3 no longer installs cleanly. |
+| **Spending cap and cost meter.** Every call's tokens and estimated cost are logged to `ckpt/usage.json`; the run stops cleanly at `--budget` (default $2). | Voyager makes many LLM calls; this stops a runaway bill. |
+| **Peak-hours guard** (on by default): pauses LLM calls Mon–Fri 11:30–14:30 and 16:30–20:30 Adelaide time. Turn off with `--no-peak-guard`. | Avoids DeepSeek peak times. |
+| **Retries with backoff** on rate limits / network errors. | Long unattended runs used to die on one API blip. |
+| **`run.py` command line** with `--resume`, `--task`, `--model`, `--action-model`. | No need to write Python to start a run. |
+| **Works on Python 3.10+ / Node 24 / Babel 8**, and `pkg_resources` removed. | Upstream pins broke on current toolchains. |
+| **Bundled skill libraries re-indexed** (`tools/rebuild_index.py`), plus `tests/smoke_test.py`. | The paper's pre-learned skills work out of the box. |
+
+## Quick start (Windows)
+
+```bash
+py -3.10 -m venv .venv
+.venv\Scripts\python -m pip install -e .
+cd voyager\env\mineflayer && npm install && cd mineflayer-collectblock && npx tsc && cd ..\..\..\..
+copy .env.example .env      # then put your DEEPSEEK_API_KEY in it (or set it as an environment variable)
+.venv\Scripts\python tests\smoke_test.py
+```
+
+Minecraft side: Java Edition **1.19** with Fabric and the mods in `installation/fabric_mods_install.md`.
+Create a world, **Open to LAN** (cheats on), note the port, then:
+
+```bash
+.venv\Scripts\python run.py --mc-port <port>                 # explore and learn, $2 cap
+.venv\Scripts\python run.py --mc-port <port> --resume        # continue
+.venv\Scripts\python run.py --mc-port <port> --ckpt skill_library\trial1 --task "Craft a diamond pickaxe"
+```
+
+The original README follows.
+
+---
+
 # Voyager: An Open-Ended Embodied Agent with Large Language Models
 <div align="center">
 

@@ -3,9 +3,7 @@ import time
 
 import voyager.utils as U
 from javascript import require
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import SystemMessagePromptTemplate
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from voyager.llm import ChatModel, AIMessage, HumanMessage, SystemMessage
 
 from voyager.prompts import load_prompt
 from voyager.control_primitives_context import load_control_primitives_context
@@ -31,10 +29,11 @@ class ActionAgent:
             self.chest_memory = U.load_json(f"{ckpt_dir}/action/chest_memory.json")
         else:
             self.chest_memory = {}
-        self.llm = ChatOpenAI(
+        self.llm = ChatModel(
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
+            agent="action",
         )
 
     def update_chest_memory(self, chests):
@@ -90,13 +89,12 @@ class ActionAgent:
             ]
         programs = "\n\n".join(load_control_primitives_context(base_skills) + skills)
         response_format = load_prompt("action_response_format")
-        system_message_prompt = SystemMessagePromptTemplate.from_template(
-            system_template
+        # plain substitution: the template has exactly these two placeholders
+        system_message = SystemMessage(
+            content=system_template.replace("{programs}", programs).replace(
+                "{response_format}", response_format
+            )
         )
-        system_message = system_message_prompt.format(
-            programs=programs, response_format=response_format
-        )
-        assert isinstance(system_message, SystemMessage)
         return system_message
 
     def render_human_message(
@@ -206,11 +204,13 @@ class ActionAgent:
         while retry > 0:
             try:
                 babel = require("@babel/core")
-                babel_generator = require("@babel/generator").default
+                _gen = require("@babel/generator")
+                babel_generator = _gen.default if _gen.default else _gen
 
                 code_pattern = re.compile(r"```(?:javascript|js)(.*?)```", re.DOTALL)
                 code = "\n".join(code_pattern.findall(message.content))
-                parsed = babel.parse(code)
+                # Babel 8 made parse() async-only; parseSync works on Babel 7 and 8
+                parsed = babel.parseSync(code)
                 functions = []
                 assert len(list(parsed.program.body)) > 0, "No functions found"
                 for i, node in enumerate(parsed.program.body):

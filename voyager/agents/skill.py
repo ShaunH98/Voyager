@@ -1,10 +1,8 @@
 import os
 
 import voyager.utils as U
-from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.schema import HumanMessage, SystemMessage
-from langchain.vectorstores import Chroma
+from voyager.llm import ChatModel, HumanMessage, SystemMessage
+from voyager.vectorstore import LocalVectorStore
 
 from voyager.prompts import load_prompt
 from voyager.control_primitives import load_control_primitives
@@ -20,10 +18,11 @@ class SkillManager:
         ckpt_dir="ckpt",
         resume=False,
     ):
-        self.llm = ChatOpenAI(
+        self.llm = ChatModel(
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
+            agent="skill",
         )
         U.f_mkdir(f"{ckpt_dir}/skill/code")
         U.f_mkdir(f"{ckpt_dir}/skill/description")
@@ -37,9 +36,8 @@ class SkillManager:
             self.skills = {}
         self.retrieval_top_k = retrieval_top_k
         self.ckpt_dir = ckpt_dir
-        self.vectordb = Chroma(
+        self.vectordb = LocalVectorStore(
             collection_name="skill_vectordb",
-            embedding_function=OpenAIEmbeddings(),
             persist_directory=f"{ckpt_dir}/skill/vectordb",
         )
         assert self.vectordb._collection.count() == len(self.skills), (

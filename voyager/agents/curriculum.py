@@ -6,10 +6,8 @@ import re
 import voyager.utils as U
 from voyager.prompts import load_prompt
 from voyager.utils.json_utils import fix_and_parse_json
-from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.schema import HumanMessage, SystemMessage
-from langchain.vectorstores import Chroma
+from voyager.llm import ChatModel, HumanMessage, SystemMessage
+from voyager.vectorstore import LocalVectorStore
 
 
 class CurriculumAgent:
@@ -26,15 +24,17 @@ class CurriculumAgent:
         warm_up=None,
         core_inventory_items: str | None = None,
     ):
-        self.llm = ChatOpenAI(
+        self.llm = ChatModel(
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
+            agent="curriculum",
         )
-        self.qa_llm = ChatOpenAI(
+        self.qa_llm = ChatModel(
             model_name=qa_model_name,
             temperature=qa_temperature,
             request_timeout=request_timout,
+            agent="curriculum_qa",
         )
         assert mode in [
             "auto",
@@ -55,9 +55,8 @@ class CurriculumAgent:
             self.failed_tasks = []
             self.qa_cache = {}
         # vectordb for qa cache
-        self.qa_cache_questions_vectordb = Chroma(
+        self.qa_cache_questions_vectordb = LocalVectorStore(
             collection_name="qa_cache_questions_vectordb",
-            embedding_function=OpenAIEmbeddings(),
             persist_directory=f"{ckpt_dir}/curriculum/vectordb",
         )
         assert self.qa_cache_questions_vectordb._collection.count() == len(
