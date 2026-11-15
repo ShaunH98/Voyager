@@ -133,3 +133,4 @@ ckpt_task/
 logs/
 .venv/
 testserver/
+ckpt_live/

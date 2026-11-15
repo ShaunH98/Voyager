@@ -45,7 +45,25 @@ def main():
     ap.add_argument("--iterations", type=int, default=160, help="max tasks to attempt")
     ap.add_argument("--task", default=None,
                     help="instead of exploring, solve this one goal using an existing skill library")
+    ap.add_argument("--seed-skills", default="skill_library/core",
+                    help="skill library a new learning run starts from ('none' = start empty)")
     args = ap.parse_args()
+
+    # A new learning run starts with a copy of the seed library, so it builds on the core skills
+    # instead of relearning "mine a log" from nothing. The seed itself is never modified.
+    seeded = False
+    if not args.task:
+        import shutil
+        dst = Path(args.ckpt) / "skill"
+        if (dst / "skills.json").exists():
+            seeded = True
+        elif args.seed_skills.lower() != "none":
+            src = Path(args.seed_skills) / "skill"
+            if not (src / "skills.json").exists():
+                ap.error(f"no skills.json under {src}")
+            shutil.copytree(src, dst)
+            seeded = True
+            print(f"Seeded {dst} from {src}")
 
     from voyager import Voyager
     from voyager.llm import BudgetExceeded, METER
@@ -67,7 +85,8 @@ def main():
             v = Voyager(**common, ckpt_dir=args.ckpt + "_task", skill_library_dir=args.ckpt, resume=False)
             v.inference(task=args.task)
         else:
-            v = Voyager(**common, ckpt_dir=args.ckpt, resume=args.resume)
+            v = Voyager(**common, ckpt_dir=args.ckpt, resume=args.resume,
+                        skill_library_dir=args.ckpt if seeded else None)
             v.learn()
     except BudgetExceeded as e:
         print(f"\n{e}. Progress is saved; continue with --resume and a higher --budget.")
