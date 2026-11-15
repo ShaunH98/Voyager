@@ -75,6 +75,9 @@ class ActionAgent:
         system_template = load_prompt("action_template")
         # FIXME: Hardcoded control_primitives
         base_skills = [
+            "obtainItem",
+            "survival",
+            "farming",
             "exploreUntil",
             "mineBlock",
             "craftItem",

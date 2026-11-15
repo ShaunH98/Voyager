@@ -1,0 +1,43 @@
+{
+  "library": "skill_library\\core",
+  "passed": 3,
+  "total": 4,
+  "results": [
+    {
+      "ok": false,
+      "died": false,
+      "secs": 213.629,
+      "err": "Event windowOpen did not fire within timeout of 20000ms",
+      "id": "iron_armor",
+      "skill": "equipIronArmor",
+      "wall": 221.4
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 92.288,
+      "err": null,
+      "id": "wool_bed",
+      "skill": "craftWhiteBed",
+      "wall": 99.6
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 127.105,
+      "err": null,
+      "id": "fish",
+      "skill": "catchThreeFish",
+      "wall": 135.0
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 27.848,
+      "err": null,
+      "id": "farm_wheat",
+      "skill": "plantAndHarvestWheat",
+      "wall": 36.7
+    }
+  ]
+}

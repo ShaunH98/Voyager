@@ -1,0 +1,3 @@
+async function defendAgainstMobs(bot) {
+    // Fight off every hostile mob within 12 blocks, eating when hungry; backs away from creepers.
+}

@@ -1,0 +1,3 @@
+async function craftBow(bot) {
+    // Craft a bow (3 sticks + 3 string) and 16 arrows (flint, sticks, feathers).
+}

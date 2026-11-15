@@ -1,0 +1,3 @@
+async function smeltRawCopper(bot) {
+    // Get 3 copper ingots by mining copper ore and smelting it.
+}

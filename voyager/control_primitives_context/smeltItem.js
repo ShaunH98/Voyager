@@ -1,5 +1,6 @@
 // Smelt 1 raw_iron into 1 iron_ingot using 1 oak_planks as fuel: smeltItem(bot, "raw_iron", "oak_planks");
-// You must place a furnace before calling this function
+// Uses a nearby furnace or places/crafts one. fuelName can be null to pick fuel automatically.
+// smeltItem(bot, "raw_iron", null, 3);
 async function smeltItem(bot, itemName, fuelName, count = 1) {
     const item = mcData.itemsByName[itemName];
     const fuel = mcData.itemsByName[fuelName];

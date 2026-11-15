@@ -1,0 +1,3 @@
+async function craftWhiteBed(bot) {
+    // Craft a bed: get 3 white wool (shear or kill sheep) and 3 planks.
+}

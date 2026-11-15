@@ -1,0 +1,3 @@
+async function fillBucketWithWater(bot) {
+    // Fill a bucket with water from the nearest water source (crafting a bucket first if needed).
+}

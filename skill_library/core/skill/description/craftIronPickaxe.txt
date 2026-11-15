@@ -1,0 +1,3 @@
+async function craftIronPickaxe(bot) {
+    // Craft an iron pickaxe: mine and smelt 3 iron, make sticks, use or place a crafting table.
+}

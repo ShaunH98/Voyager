@@ -1,0 +1,3 @@
+async function prepareForNight(bot) {
+    // Before dark: get 4 cooked food, 8 torches, a stone sword and wear the best gear.
+}

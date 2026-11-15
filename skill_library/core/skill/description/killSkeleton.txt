@@ -1,0 +1,3 @@
+async function killSkeleton(bot) {
+    // Kill the nearest skeleton: close the distance quickly with a shield up, then fight.
+}

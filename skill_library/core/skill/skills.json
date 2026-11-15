@@ -1,0 +1,186 @@
+{
+  "mineWoodLog": {
+    "code": "async function mineWoodLog(bot) {\n  await obtainItem(bot, \"log\", 3);\n}",
+    "description": "async function mineWoodLog(bot) {\n    // Collect 3 logs of any wood type from the nearest trees, exploring to find trees if needed.\n}"
+  },
+  "craftSticks": {
+    "code": "async function craftSticks(bot) {\n  await obtainItem(bot, \"stick\", 4);\n}",
+    "description": "async function craftSticks(bot) {\n    // Craft at least 4 sticks, making planks from logs (and getting logs) as needed.\n}"
+  },
+  "craftCraftingTable": {
+    "code": "async function craftCraftingTable(bot) {\n  await obtainItem(bot, \"crafting_table\", 1);\n}",
+    "description": "async function craftCraftingTable(bot) {\n    // Craft a crafting table from planks, getting logs first if necessary.\n}"
+  },
+  "craftWoodenPickaxe": {
+    "code": "async function craftWoodenPickaxe(bot) {\n  await obtainItem(bot, \"wooden_pickaxe\", 1);\n}",
+    "description": "async function craftWoodenPickaxe(bot) {\n    // Craft a wooden pickaxe, collecting wood and making planks, sticks and a crafting table as needed.\n}"
+  },
+  "craftWoodenAxe": {
+    "code": "async function craftWoodenAxe(bot) {\n  await obtainItem(bot, \"wooden_axe\", 1);\n}",
+    "description": "async function craftWoodenAxe(bot) {\n    // Craft a wooden axe from scratch.\n}"
+  },
+  "craftWoodenSword": {
+    "code": "async function craftWoodenSword(bot) {\n  await obtainItem(bot, \"wooden_sword\", 1);\n}",
+    "description": "async function craftWoodenSword(bot) {\n    // Craft a wooden sword from scratch.\n}"
+  },
+  "craftChest": {
+    "code": "async function craftChest(bot) {\n  await obtainItem(bot, \"chest\", 1);\n}",
+    "description": "async function craftChest(bot) {\n    // Craft a chest (8 planks), getting wood as needed.\n}"
+  },
+  "mineTenCobblestone": {
+    "code": "async function mineTenCobblestone(bot) {\n  await obtainItem(bot, \"cobblestone\", 10);\n}",
+    "description": "async function mineTenCobblestone(bot) {\n    // Mine 10 cobblestone, making a wooden pickaxe first if there is none.\n}"
+  },
+  "craftStonePickaxe": {
+    "code": "async function craftStonePickaxe(bot) {\n  await obtainItem(bot, \"stone_pickaxe\", 1);\n}",
+    "description": "async function craftStonePickaxe(bot) {\n    // Craft a stone pickaxe, mining cobblestone with a wooden pickaxe first if needed.\n}"
+  },
+  "craftStoneTools": {
+    "code": "async function craftStoneTools(bot) {\n  await obtainItem(bot, \"stone_pickaxe\", 1);\n  await obtainItem(bot, \"stone_axe\", 1);\n  await obtainItem(bot, \"stone_sword\", 1);\n  await obtainItem(bot, \"stone_shovel\", 1);\n}",
+    "description": "async function craftStoneTools(bot) {\n    // Craft a full set of stone tools: pickaxe, axe, sword and shovel.\n}"
+  },
+  "craftStoneSword": {
+    "code": "async function craftStoneSword(bot) {\n  await obtainItem(bot, \"stone_sword\", 1);\n}",
+    "description": "async function craftStoneSword(bot) {\n    // Craft a stone sword.\n}"
+  },
+  "craftFurnace": {
+    "code": "async function craftFurnace(bot) {\n  await obtainItem(bot, \"furnace\", 1);\n}",
+    "description": "async function craftFurnace(bot) {\n    // Craft a furnace from 8 cobblestone, getting a pickaxe and cobblestone if needed.\n}"
+  },
+  "mineFiveCoalOres": {
+    "code": "async function mineFiveCoalOres(bot) {\n  await obtainItem(bot, \"coal\", 5);\n}",
+    "description": "async function mineFiveCoalOres(bot) {\n    // Mine at least 5 coal, getting a pickaxe first and exploring or digging down if no coal ore is visible.\n}"
+  },
+  "craftTorches": {
+    "code": "async function craftTorches(bot) {\n  if (!(await obtainItem(bot, \"coal\", 2))) { await obtainItem(bot, \"charcoal\", 2); }\n  await obtainItem(bot, \"torch\", 8);\n}",
+    "description": "async function craftTorches(bot) {\n    // Craft at least 8 torches from coal (or charcoal) and sticks.\n}"
+  },
+  "smeltRawIron": {
+    "code": "async function smeltRawIron(bot) {\n  await obtainItem(bot, \"iron_ingot\", 3);\n}",
+    "description": "async function smeltRawIron(bot) {\n    // Get 3 iron ingots: mine iron ore (digging down if needed) with a stone pickaxe and smelt it in a furnace.\n}"
+  },
+  "craftIronPickaxe": {
+    "code": "async function craftIronPickaxe(bot) {\n  await obtainItem(bot, \"iron_pickaxe\", 1);\n}",
+    "description": "async function craftIronPickaxe(bot) {\n    // Craft an iron pickaxe: mine and smelt 3 iron, make sticks, use or place a crafting table.\n}"
+  },
+  "craftIronSword": {
+    "code": "async function craftIronSword(bot) {\n  await obtainItem(bot, \"iron_sword\", 1);\n}",
+    "description": "async function craftIronSword(bot) {\n    // Craft an iron sword, mining and smelting iron as needed.\n}"
+  },
+  "craftIronAxe": {
+    "code": "async function craftIronAxe(bot) {\n  await obtainItem(bot, \"iron_axe\", 1);\n}",
+    "description": "async function craftIronAxe(bot) {\n    // Craft an iron axe, mining and smelting iron as needed.\n}"
+  },
+  "craftBucket": {
+    "code": "async function craftBucket(bot) {\n  await obtainItem(bot, \"bucket\", 1);\n}",
+    "description": "async function craftBucket(bot) {\n    // Craft a bucket from 3 iron ingots.\n}"
+  },
+  "fillBucketWithWater": {
+    "code": "async function fillBucketWithWater(bot) {\n  await collectWater(bot);\n}",
+    "description": "async function fillBucketWithWater(bot) {\n    // Fill a bucket with water from the nearest water source (crafting a bucket first if needed).\n}"
+  },
+  "craftShield": {
+    "code": "async function craftShield(bot) {\n  await obtainItem(bot, \"shield\", 1);\n  const s = bot.inventory.findInventoryItem(mcData.itemsByName.shield.id);\n  if (s) await bot.equip(s, \"off-hand\");\n}",
+    "description": "async function craftShield(bot) {\n    // Craft a shield (6 planks + 1 iron ingot) and put it in the off-hand.\n}"
+  },
+  "smeltRawCopper": {
+    "code": "async function smeltRawCopper(bot) {\n  await obtainItem(bot, \"copper_ingot\", 3);\n}",
+    "description": "async function smeltRawCopper(bot) {\n    // Get 3 copper ingots by mining copper ore and smelting it.\n}"
+  },
+  "equipIronArmor": {
+    "code": "async function equipIronArmor(bot) {\n  const have = (n) => bot.inventory.items().some((i) => i.name === n) || Object.values(bot.inventory.slots).some((s) => s && s.name === n);\n  const missing = [\"iron_helmet\", \"iron_chestplate\", \"iron_leggings\", \"iron_boots\"].filter((n) => !have(n));\n  const cost = { iron_helmet: 5, iron_chestplate: 8, iron_leggings: 7, iron_boots: 4 };\n  // one mining + smelting trip for all the iron we need\n  await obtainItem(bot, \"iron_ingot\", missing.reduce((a, n) => a + cost[n], 0));\n  for (const n of missing) await obtainItem(bot, n, 1);\n  await equipBestGear(bot);\n}",
+    "description": "async function equipIronArmor(bot) {\n    // Make a full set of iron armour (helmet, chestplate, leggings, boots; 24 iron) and wear it.\n}"
+  },
+  "craftCompass": {
+    "code": "async function craftCompass(bot) {\n  await obtainItem(bot, \"compass\", 1);\n}",
+    "description": "async function craftCompass(bot) {\n    // Craft a compass from 4 iron ingots and 1 redstone.\n}"
+  },
+  "craftShears": {
+    "code": "async function craftShears(bot) {\n  await obtainItem(bot, \"shears\", 1);\n}",
+    "description": "async function craftShears(bot) {\n    // Craft shears from 2 iron ingots.\n}"
+  },
+  "smeltGlass": {
+    "code": "async function smeltGlass(bot) {\n  await obtainItem(bot, \"glass\", 4);\n}",
+    "description": "async function smeltGlass(bot) {\n    // Get 4 glass by collecting sand and smelting it.\n}"
+  },
+  "mineLapisLazuli": {
+    "code": "async function mineLapisLazuli(bot) {\n  await obtainItem(bot, \"lapis_lazuli\", 4);\n}",
+    "description": "async function mineLapisLazuli(bot) {\n    // Mine at least 4 lapis lazuli, digging down to around y=0 if needed.\n}"
+  },
+  "mineDiamonds": {
+    "code": "async function mineDiamonds(bot) {\n  await obtainItem(bot, \"diamond\", 1);\n}",
+    "description": "async function mineDiamonds(bot) {\n    // Mine at least 1 diamond: get an iron pickaxe, dig down to diamond level (y around -56) and search.\n}"
+  },
+  "craftDiamondPickaxe": {
+    "code": "async function craftDiamondPickaxe(bot) {\n  await obtainItem(bot, \"diamond_pickaxe\", 1);\n}",
+    "description": "async function craftDiamondPickaxe(bot) {\n    // Craft a diamond pickaxe (3 diamonds + 2 sticks), mining diamonds with an iron pickaxe as needed.\n}"
+  },
+  "craftDiamondSword": {
+    "code": "async function craftDiamondSword(bot) {\n  await obtainItem(bot, \"diamond_sword\", 1);\n}",
+    "description": "async function craftDiamondSword(bot) {\n    // Craft a diamond sword.\n}"
+  },
+  "mineRedstone": {
+    "code": "async function mineRedstone(bot) {\n  await obtainItem(bot, \"redstone\", 4);\n}",
+    "description": "async function mineRedstone(bot) {\n    // Mine at least 4 redstone dust with an iron pickaxe.\n}"
+  },
+  "craftWhiteBed": {
+    "code": "async function craftWhiteBed(bot) {\n  await obtainItem(bot, \"white_bed\", 1);\n}",
+    "description": "async function craftWhiteBed(bot) {\n    // Craft a bed: get 3 white wool (shear or kill sheep) and 3 planks.\n}"
+  },
+  "cookMeat": {
+    "code": "async function cookMeat(bot) {\n  await getFood(bot, 4);\n}",
+    "description": "async function cookMeat(bot) {\n    // Make sure we carry at least 4 cooked meat: hunt cows, pigs, sheep or chickens and cook the meat.\n}"
+  },
+  "eatWhenHungry": {
+    "code": "async function eatWhenHungry(bot) {\n  await eatIfHungry(bot, 18);\n}",
+    "description": "async function eatWhenHungry(bot) {\n    // Eat the best food in the inventory until hunger is at least 18/20.\n}"
+  },
+  "catchThreeFish": {
+    "code": "async function catchThreeFish(bot) {\n  await catchFish(bot, 3);\n}",
+    "description": "async function catchThreeFish(bot) {\n    // Fish with a fishing rod (crafted if needed) at nearby water until 3 fish are caught.\n}"
+  },
+  "plantAndHarvestWheat": {
+    "code": "async function plantAndHarvestWheat(bot) {\n  await farmWheat(bot, 3);\n}",
+    "description": "async function plantAndHarvestWheat(bot) {\n    // Farm wheat: till dirt next to water, plant seeds, use bone meal if held, harvest 3 wheat.\n}"
+  },
+  "craftBread": {
+    "code": "async function craftBread(bot) {\n  if (!(await obtainItem(bot, \"wheat\", 6))) { await farmWheat(bot, 6); }\n  await obtainItem(bot, \"bread\", 2);\n}",
+    "description": "async function craftBread(bot) {\n    // Make 2 bread from 6 wheat, farming wheat first if needed.\n}"
+  },
+  "craftFishingRod": {
+    "code": "async function craftFishingRod(bot) {\n  await obtainItem(bot, \"fishing_rod\", 1);\n}",
+    "description": "async function craftFishingRod(bot) {\n    // Craft a fishing rod (3 sticks + 2 string from spiders).\n}"
+  },
+  "craftBow": {
+    "code": "async function craftBow(bot) {\n  await obtainItem(bot, \"bow\", 1);\n  await obtainItem(bot, \"arrow\", 16);\n}",
+    "description": "async function craftBow(bot) {\n    // Craft a bow (3 sticks + 3 string) and 16 arrows (flint, sticks, feathers).\n}"
+  },
+  "killOneZombie": {
+    "code": "async function killOneZombie(bot) {\n  await equipBestGear(bot);\n  await killMob(bot, \"zombie\", 120);\n}",
+    "description": "async function killOneZombie(bot) {\n    // Kill the nearest zombie with the best weapon, keeping armour and shield equipped.\n}"
+  },
+  "killOneSpider": {
+    "code": "async function killOneSpider(bot) {\n  await equipBestGear(bot);\n  await killMob(bot, \"spider\", 120);\n}",
+    "description": "async function killOneSpider(bot) {\n    // Kill the nearest spider and collect its string.\n}"
+  },
+  "killSkeleton": {
+    "code": "async function killSkeleton(bot) {\n  await equipBestGear(bot);\n  await killMob(bot, \"skeleton\", 120);\n}",
+    "description": "async function killSkeleton(bot) {\n    // Kill the nearest skeleton: close the distance quickly with a shield up, then fight.\n}"
+  },
+  "defendAgainstMobs": {
+    "code": "async function defendAgainstMobs(bot) {\n  await defendSelf(bot, 12, 90);\n}",
+    "description": "async function defendAgainstMobs(bot) {\n    // Fight off every hostile mob within 12 blocks, eating when hungry; backs away from creepers.\n}"
+  },
+  "surviveTheNight": {
+    "code": "async function surviveTheNight(bot) {\n  await surviveNight(bot, 150);\n}",
+    "description": "async function surviveTheNight(bot) {\n    // Survive the night: equip gear, eat, sleep if a bed is held, otherwise fight nearby mobs, dig a sealed shelter and wait for morning.\n}"
+  },
+  "prepareForNight": {
+    "code": "async function prepareForNight(bot) {\n  await getFood(bot, 4);\n  await obtainItem(bot, \"stone_sword\", 1);\n  await obtainItem(bot, \"torch\", 8);\n  await equipBestGear(bot);\n}",
+    "description": "async function prepareForNight(bot) {\n    // Before dark: get 4 cooked food, 8 torches, a stone sword and wear the best gear.\n}"
+  },
+  "buildEmergencyShelter": {
+    "code": "async function buildEmergencyShelter(bot) {\n  await buildShelter(bot);\n}",
+    "description": "async function buildEmergencyShelter(bot) {\n    // Dig into the ground and seal the hole above to hide from mobs immediately.\n}"
+  }
+}

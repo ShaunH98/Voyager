@@ -1,0 +1,3 @@
+async function plantAndHarvestWheat(bot) {
+    // Farm wheat: till dirt next to water, plant seeds, use bone meal if held, harvest 3 wheat.
+}

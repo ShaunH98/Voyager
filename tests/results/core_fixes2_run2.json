@@ -1,0 +1,43 @@
+{
+  "library": "skill_library\\core",
+  "passed": 2,
+  "total": 4,
+  "results": [
+    {
+      "ok": false,
+      "died": false,
+      "secs": null,
+      "err": "ReadTimeout: HTTPConnectionPool(host='127.0.0.1', port=3010): Read timed out. (read timeout=420)",
+      "id": "iron_armor",
+      "skill": "equipIronArmor",
+      "wall": 420.5
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 38.506,
+      "err": null,
+      "id": "wool_bed",
+      "skill": "craftWhiteBed",
+      "wall": 46.3
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 253.238,
+      "err": null,
+      "id": "fish",
+      "skill": "catchThreeFish",
+      "wall": 262.1
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 48.877,
+      "err": null,
+      "id": "farm_wheat",
+      "skill": "plantAndHarvestWheat",
+      "wall": 55.5
+    }
+  ]
+}

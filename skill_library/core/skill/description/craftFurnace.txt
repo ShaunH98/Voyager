@@ -1,0 +1,3 @@
+async function craftFurnace(bot) {
+    // Craft a furnace from 8 cobblestone, getting a pickaxe and cobblestone if needed.
+}

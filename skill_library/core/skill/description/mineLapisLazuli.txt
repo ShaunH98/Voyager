@@ -1,0 +1,3 @@
+async function mineLapisLazuli(bot) {
+    // Mine at least 4 lapis lazuli, digging down to around y=0 if needed.
+}

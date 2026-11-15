@@ -1,0 +1,3 @@
+async function eatWhenHungry(bot) {
+    // Eat the best food in the inventory until hunger is at least 18/20.
+}

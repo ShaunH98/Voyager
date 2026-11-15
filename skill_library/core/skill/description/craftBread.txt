@@ -1,0 +1,3 @@
+async function craftBread(bot) {
+    // Make 2 bread from 6 wheat, farming wheat first if needed.
+}

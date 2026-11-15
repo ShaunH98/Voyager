@@ -1,0 +1,52 @@
+{
+  "library": "skill_library\\core",
+  "passed": 3,
+  "total": 5,
+  "results": [
+    {
+      "ok": true,
+      "died": false,
+      "secs": 26.65,
+      "err": null,
+      "id": "stone_pickaxe",
+      "skill": "craftStonePickaxe",
+      "wall": 34.1
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 268.803,
+      "err": null,
+      "id": "iron_armor",
+      "skill": "equipIronArmor",
+      "wall": 275.3
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 87.723,
+      "err": null,
+      "id": "wool_bed",
+      "skill": "craftWhiteBed",
+      "wall": 95.5
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 242.684,
+      "err": null,
+      "id": "fish",
+      "skill": "catchThreeFish",
+      "wall": 250.3
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 30.863,
+      "err": null,
+      "id": "farm_wheat",
+      "skill": "plantAndHarvestWheat",
+      "wall": 38.1
+    }
+  ]
+}

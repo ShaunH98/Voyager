@@ -1,0 +1,3 @@
+async function catchThreeFish(bot) {
+    // Fish with a fishing rod (crafted if needed) at nearby water until 3 fish are caught.
+}

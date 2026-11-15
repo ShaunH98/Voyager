@@ -1,0 +1,3 @@
+async function craftStoneTools(bot) {
+    // Craft a full set of stone tools: pickaxe, axe, sword and shovel.
+}

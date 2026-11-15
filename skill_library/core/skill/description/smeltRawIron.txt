@@ -1,0 +1,3 @@
+async function smeltRawIron(bot) {
+    // Get 3 iron ingots: mine iron ore (digging down if needed) with a stone pickaxe and smelt it in a furnace.
+}

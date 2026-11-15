@@ -1,0 +1,3 @@
+async function craftWoodenSword(bot) {
+    // Craft a wooden sword from scratch.
+}

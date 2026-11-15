@@ -1,0 +1,3 @@
+async function mineTenCobblestone(bot) {
+    // Mine 10 cobblestone, making a wooden pickaxe first if there is none.
+}

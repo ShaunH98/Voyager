@@ -1,0 +1,3 @@
+async function mineDiamonds(bot) {
+    // Mine at least 1 diamond: get an iron pickaxe, dig down to diamond level (y around -56) and search.
+}

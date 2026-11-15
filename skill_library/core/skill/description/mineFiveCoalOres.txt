@@ -1,0 +1,3 @@
+async function mineFiveCoalOres(bot) {
+    // Mine at least 5 coal, getting a pickaxe first and exploring or digging down if no coal ore is visible.
+}

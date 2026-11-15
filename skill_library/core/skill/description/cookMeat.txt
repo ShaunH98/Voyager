@@ -1,0 +1,3 @@
+async function cookMeat(bot) {
+    // Make sure we carry at least 4 cooked meat: hunt cows, pigs, sheep or chickens and cook the meat.
+}

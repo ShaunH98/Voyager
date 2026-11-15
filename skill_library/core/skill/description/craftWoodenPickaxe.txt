@@ -1,0 +1,3 @@
+async function craftWoodenPickaxe(bot) {
+    // Craft a wooden pickaxe, collecting wood and making planks, sticks and a crafting table as needed.
+}

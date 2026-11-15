@@ -1,4 +1,5 @@
 // Mine 3 cobblestone: mineBlock(bot, "stone", 3);
+// Ore names also match deepslate variants; explores briefly if none are nearby; equips the best tool.
 async function mineBlock(bot, name, count = 1) {
     const blocks = bot.findBlocks({
         matching: (block) => {

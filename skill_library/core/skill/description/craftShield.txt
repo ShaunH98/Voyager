@@ -1,0 +1,3 @@
+async function craftShield(bot) {
+    // Craft a shield (6 planks + 1 iron ingot) and put it in the off-hand.
+}

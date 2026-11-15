@@ -1,0 +1,3 @@
+async function craftIronSword(bot) {
+    // Craft an iron sword, mining and smelting iron as needed.
+}

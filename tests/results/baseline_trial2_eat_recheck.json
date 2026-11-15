@@ -1,0 +1,16 @@
+{
+  "library": "skill_library\\trial2",
+  "passed": 0,
+  "total": 1,
+  "results": [
+    {
+      "ok": false,
+      "died": false,
+      "secs": 3.049,
+      "err": null,
+      "id": "eat_when_hungry",
+      "skill": "eatCookedMutton",
+      "wall": 19.4
+    }
+  ]
+}

@@ -12,6 +12,70 @@ This fork updates the 2023 research code so it installs and runs today, cheaply.
 | **`run.py` command line** with `--resume`, `--task`, `--model`, `--action-model`. | No need to write Python to start a run. |
 | **Works on Python 3.10+ / Node 24 / Babel 8**, and `pkg_resources` removed. | Upstream pins broke on current toolchains. |
 | **Bundled skill libraries re-indexed** (`tools/rebuild_index.py`), plus `tests/smoke_test.py`. | The paper's pre-learned skills work out of the box. |
+| **Much stronger built-in skills** (see below): a recursive `obtainItem` planner, safe digging, survival, combat, fishing and farming, plus a new curated `skill_library/core`. | The paper's skills pass 2–8 of 32 benchmark tasks; the new library passes 28–30. |
+
+## Stronger skills
+
+### New primitives (`voyager/control_primitives/`)
+
+These are the building blocks every generated program can call:
+
+- **`obtainItem(bot, name, count)`** works out how to get almost any survival item and does it, recursively. It gathers, mines (digging a safe staircase down to the right ore depth), smelts, hunts or crafts, chooses the cheapest recipe, and makes the tools it needs on the way. For example, `obtainItem(bot, "diamond_pickaxe")` from an empty inventory goes wood → stone → iron → diamonds.
+- **Safety and reliability**:
+  - every move, collect and dig is time-boxed, so the bot can't hang;
+  - it won't dig into lava or water;
+  - it re-digs falling gravel;
+  - an anti-drowning reflex is built in;
+  - crafting retries cope with the server lagging behind.
+- **Survival**:
+  - `eatIfHungry`, `getFood` (hunt and cook);
+  - `equipBestGear` (armour, shield, best weapon);
+  - `defendSelf` (backs away from creepers);
+  - `buildShelter` (dig in and seal the hole);
+  - `surviveNight` (sleeps if it has a bed, otherwise shelters and waits).
+- **Farming and fishing**: `collectWater`, `catchFish`, `farmWheat` (till, plant, bone-meal, harvest).
+- **Upgrades to the originals**:
+  - `craftItem` and `smeltItem` place their own crafting table and furnace, and pick them back up afterwards; `smeltItem` picks fuel automatically.
+  - `mineBlock` handles deepslate ore variants.
+  - `killMob` uses the best weapon and a shield, and backs off to eat when health is low.
+
+### Curated skill library (`skill_library/core`)
+
+46 short, readable skills in place of the three ~50-skill libraries from the paper. Those had 120 distinct names, many near-duplicates, and 1.18-era bugs such as smelting `iron_ore`. The new library covers:
+
+- wood and stone tools
+- coal, torches, iron, copper, lapis, redstone and diamonds
+- buckets, shields, armour, beds, compasses, glass and bows
+- food, fishing and farming
+- zombies, spiders and skeletons
+- surviving the night
+
+Rebuild it with `python tools/build_core_library.py && python tools/rebuild_index.py skill_library/core`.
+Use it with `--ckpt skill_library\core`.
+
+### Benchmark (`tests/skill_bench.py`, 32 tasks)
+
+Each task runs the library's best-matching skill in fresh terrain on a headless 1.19 server, then checks the inventory or world state. There are no LLM calls, so it is free and repeatable.
+
+```bash
+.venv\Scripts\python tests\skill_bench.py --library skill_library\core --mc-port 25599
+```
+
+| Skill library | Tasks passed (of 32) |
+|---|---|
+| Paper `trial1` | 8 |
+| Paper `trial2` | 3 |
+| Paper `trial3` | 2 |
+| **New `core`** | **28** (final full run; 27 on the run before). Every task has passed at least once. |
+
+The failures that remain are mostly bad luck with terrain:
+
+- dying while digging for diamonds
+- no animals within 6 minutes
+- nowhere to put a furnace in a cramped tunnel
+- fishing that sometimes fails to land a catch
+
+The paper libraries failed mainly on 1.18→1.19 changes, hard-coded counts, and hangs while pathfinding or digging. Raw results are in `tests/results/`.
 
 ## Quick start (Windows)
 
@@ -29,7 +93,7 @@ Create a world, **Open to LAN** (cheats on), note the port, then:
 ```bash
 .venv\Scripts\python run.py --mc-port <port>                 # explore and learn, $2 cap
 .venv\Scripts\python run.py --mc-port <port> --resume        # continue
-.venv\Scripts\python run.py --mc-port <port> --ckpt skill_library\trial1 --task "Craft a diamond pickaxe"
+.venv\Scripts\python run.py --mc-port <port> --ckpt skill_library\core --task "Craft a diamond pickaxe"
 ```
 
 The original README follows.

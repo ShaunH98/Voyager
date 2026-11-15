@@ -1,0 +1,3 @@
+async function killOneZombie(bot) {
+    // Kill the nearest zombie with the best weapon, keeping armour and shield equipped.
+}

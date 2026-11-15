@@ -1,0 +1,3 @@
+async function craftCompass(bot) {
+    // Craft a compass from 4 iron ingots and 1 redstone.
+}

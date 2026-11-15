@@ -1,0 +1,295 @@
+{
+  "library": "skill_library\\core",
+  "passed": 28,
+  "total": 32,
+  "results": [
+    {
+      "ok": true,
+      "died": false,
+      "secs": 12.546,
+      "err": null,
+      "id": "logs",
+      "skill": "mineWoodLog",
+      "wall": 20.2
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 1.039,
+      "err": null,
+      "id": "planks_sticks",
+      "skill": "craftSticks",
+      "wall": 8.0
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 1.151,
+      "err": null,
+      "id": "crafting_table",
+      "skill": "craftCraftingTable",
+      "wall": 9.2
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 11.975,
+      "err": null,
+      "id": "wooden_pickaxe",
+      "skill": "craftWoodenPickaxe",
+      "wall": 20.8
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 49.654,
+      "err": null,
+      "id": "cobblestone",
+      "skill": "mineTenCobblestone",
+      "wall": 58.1
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 28.165,
+      "err": null,
+      "id": "stone_pickaxe",
+      "skill": "craftStonePickaxe",
+      "wall": 34.8
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 46.015,
+      "err": null,
+      "id": "stone_tools",
+      "skill": "craftStoneTools",
+      "wall": 52.9
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 62.769,
+      "err": null,
+      "id": "furnace",
+      "skill": "craftFurnace",
+      "wall": 70.2
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 23.464,
+      "err": null,
+      "id": "torches",
+      "skill": "craftTorches",
+      "wall": 32.0
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 11.558,
+      "err": null,
+      "id": "chest",
+      "skill": "craftChest",
+      "wall": 20.3
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 28.467,
+      "err": null,
+      "id": "coal",
+      "skill": "mineFiveCoalOres",
+      "wall": 35.6
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 129.147,
+      "err": null,
+      "id": "iron_ingots",
+      "skill": "smeltRawIron",
+      "wall": 135.9
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 85.252,
+      "err": null,
+      "id": "iron_pickaxe",
+      "skill": "craftIronPickaxe",
+      "wall": 93.3
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 46.162,
+      "err": null,
+      "id": "iron_sword",
+      "skill": "craftIronSword",
+      "wall": 53.7
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 87.719,
+      "err": null,
+      "id": "bucket",
+      "skill": "craftBucket",
+      "wall": 94.6
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 1.61,
+      "err": null,
+      "id": "water_bucket",
+      "skill": "fillBucketWithWater",
+      "wall": 8.9
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 48.386,
+      "err": null,
+      "id": "shield",
+      "skill": "craftShield",
+      "wall": 55.6
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 58.995,
+      "err": null,
+      "id": "copper",
+      "skill": "smeltRawCopper",
+      "wall": 66.4
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 401.35,
+      "err": "Couldn't find a spot to place the furnace",
+      "id": "iron_armor",
+      "skill": "equipIronArmor",
+      "wall": 407.0
+    },
+    {
+      "ok": false,
+      "died": true,
+      "secs": 357.134,
+      "err": null,
+      "id": "diamond",
+      "skill": "mineDiamonds",
+      "wall": 363.4
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 879.523,
+      "err": null,
+      "id": "diamond_pickaxe",
+      "skill": "craftDiamondPickaxe",
+      "wall": 886.3
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 232.959,
+      "err": null,
+      "id": "wool_bed",
+      "skill": "craftWhiteBed",
+      "wall": 240.5
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 360.801,
+      "err": null,
+      "id": "cooked_meat",
+      "skill": "cookMeat",
+      "wall": 368.7
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 8.251,
+      "err": null,
+      "id": "eat_when_hungry",
+      "skill": "eatWhenHungry",
+      "wall": 24.7
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 85.804,
+      "err": null,
+      "id": "fish",
+      "skill": "catchThreeFish",
+      "wall": 93.8
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 22.889,
+      "err": null,
+      "id": "farm_wheat",
+      "skill": "plantAndHarvestWheat",
+      "wall": 30.8
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 4.877,
+      "err": null,
+      "id": "kill_zombie",
+      "skill": "killOneZombie",
+      "wall": 13.7
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 11.374,
+      "err": null,
+      "id": "kill_spider",
+      "skill": "killOneSpider",
+      "wall": 19.2
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 4.661,
+      "err": null,
+      "id": "kill_skeleton",
+      "skill": "killSkeleton",
+      "wall": 12.8
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 155.978,
+      "err": null,
+      "id": "survive_night",
+      "skill": "surviveTheNight",
+      "wall": 163.3
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 51.921,
+      "err": null,
+      "id": "scratch_stone_pickaxe",
+      "skill": "call",
+      "wall": 59.4
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 156.872,
+      "err": null,
+      "id": "scratch_iron_pickaxe",
+      "skill": "call",
+      "wall": 165.0
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+async function craftDiamondPickaxe(bot) {
+    // Craft a diamond pickaxe (3 diamonds + 2 sticks), mining diamonds with an iron pickaxe as needed.
+}

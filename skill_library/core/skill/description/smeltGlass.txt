@@ -1,0 +1,3 @@
+async function smeltGlass(bot) {
+    // Get 4 glass by collecting sand and smelting it.
+}

@@ -1,0 +1,3 @@
+async function craftSticks(bot) {
+    // Craft at least 4 sticks, making planks from logs (and getting logs) as needed.
+}

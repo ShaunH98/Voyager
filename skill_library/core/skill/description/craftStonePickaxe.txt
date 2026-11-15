@@ -1,0 +1,3 @@
+async function craftStonePickaxe(bot) {
+    // Craft a stone pickaxe, mining cobblestone with a wooden pickaxe first if needed.
+}

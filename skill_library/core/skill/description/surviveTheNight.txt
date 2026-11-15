@@ -1,0 +1,3 @@
+async function surviveTheNight(bot) {
+    // Survive the night: equip gear, eat, sleep if a bed is held, otherwise fight nearby mobs, dig a sealed shelter and wait for morning.
+}

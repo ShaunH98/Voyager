@@ -1,0 +1,3 @@
+async function equipIronArmor(bot) {
+    // Make a full set of iron armour (helmet, chestplate, leggings, boots; 24 iron) and wear it.
+}

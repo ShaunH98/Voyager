@@ -1,0 +1,3 @@
+async function craftTorches(bot) {
+    // Craft at least 8 torches from coal (or charcoal) and sticks.
+}

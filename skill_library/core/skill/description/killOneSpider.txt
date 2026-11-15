@@ -1,0 +1,3 @@
+async function killOneSpider(bot) {
+    // Kill the nearest spider and collect its string.
+}

@@ -1,0 +1,3 @@
+async function buildEmergencyShelter(bot) {
+    // Dig into the ground and seal the hole above to hide from mobs immediately.
+}
