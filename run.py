@@ -28,6 +28,12 @@ def load_dotenv(path: Path):
 
 
 def main():
+    # LLM answers contain characters like "→" that crash printing to a Windows cp1252 console/log.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
     load_dotenv(HERE / ".env")
     ap = argparse.ArgumentParser(description="Run the Voyager Minecraft agent")
     ap.add_argument("--mc-port", type=int, required=True,
