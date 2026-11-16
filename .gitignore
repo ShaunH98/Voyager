@@ -134,3 +134,4 @@ logs/
 .venv/
 testserver/
 ckpt_live/
+ckpt_live_backup/

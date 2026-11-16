@@ -51,6 +51,8 @@ def main():
     ap.add_argument("--iterations", type=int, default=160, help="max tasks to attempt")
     ap.add_argument("--task", default=None,
                     help="instead of exploring, solve this one goal using an existing skill library")
+    ap.add_argument("--no-evolve", action="store_true",
+                    help="plain Voyager learning: no skill fitness, merging, lessons or self-repair")
     ap.add_argument("--seed-skills", default="skill_library/core",
                     help="skill library a new learning run starts from ('none' = start empty)")
     args = ap.parse_args()
@@ -85,6 +87,7 @@ def main():
         critic_agent_model_name=args.model,
         skill_manager_model_name=args.model,
         max_iterations=args.iterations,
+        evolve=not args.no_evolve,
     )
     try:
         if args.task:

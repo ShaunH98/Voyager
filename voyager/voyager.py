@@ -1,5 +1,6 @@
 import copy
 import json
+import re
 import os
 import time
 from typing import Dict
@@ -11,7 +12,8 @@ from .agents import ActionAgent
 from .agents import CriticAgent
 from .agents import CurriculumAgent
 from .agents import SkillManager
-from .llm import METER, PEAK, BudgetExceeded
+from .llm import METER, PEAK, BudgetExceeded, ChatModel
+from .evolution import LessonBook
 
 
 # TODO: remove event memory
@@ -25,6 +27,8 @@ class Voyager:
         provider: str = None,
         budget_usd: float = None,
         peak_guard: bool = False,
+        evolve: bool = True,
+        repair_every: int = 6,
         env_wait_ticks: int = 20,
         env_request_timeout: int = 600,
         max_iterations: int = 160,
@@ -167,6 +171,23 @@ class Voyager:
         self.recorder = U.EventRecorder(ckpt_dir=ckpt_dir, resume=resume)
         self.resume = resume
 
+        # evolution (see voyager/evolution.py): lessons live next to the skill library
+        self.evolve = evolve
+        self.repair_every = repair_every
+        self._since_repair = 0
+        self._attempts = []
+        self.lesson_text = ""
+        self.lessons = (
+            LessonBook(
+                ckpt_dir=skill_library_dir if skill_library_dir else ckpt_dir,
+                resume=True if resume or skill_library_dir else False,
+                llm=ChatModel(model_name=skill_manager_model_name, temperature=0,
+                              request_timeout=openai_api_request_timeout, agent="lessons"),
+            )
+            if evolve
+            else None
+        )
+
         # init variables for rollout
         self.action_agent_rollout_num_iter = -1
         self.task = None
@@ -198,9 +219,13 @@ class Voyager:
         print(
             f"\033[33mRender Action Agent system message with {len(skills)} skills\033[0m"
         )
+        self._attempts = []
+        self.lesson_text = self.lessons.render(f"{task}. {context}") if self.lessons else ""
+        if self.lesson_text:
+            print(f"\033[36m{self.lesson_text}\033[0m")
         system_message = self.action_agent.render_system_message(skills=skills)
         human_message = self.action_agent.render_human_message(
-            events=events, code="", task=self.task, context=context, critique=""
+            events=events, code="", task=self.task, context=self._context_with_lessons(), critique=""
         )
         self.messages = [system_message, human_message]
         print(
@@ -209,6 +234,21 @@ class Voyager:
         assert len(self.messages) == 2
         self.conversations = []
         return self.messages
+
+    def _context_with_lessons(self):
+        if not self.lesson_text:
+            return self.context
+        return (self.context + "\n\n" if self.context else "") + self.lesson_text
+
+    def _record_attempt(self, code, events, success, critique):
+        errors = "\n".join(e["onError"] for t, e in events if t == "onError")
+        chat = "\n".join(e["onChat"] for t, e in events if t == "onChat")
+        self._attempts.append(
+            {"code": code, "errors": errors, "chat": chat, "success": success, "critique": critique}
+        )
+        if self.evolve:
+            used = self.skill_manager.used_in(code)
+            self.skill_manager.stats.record(used, success, note=errors or critique)
 
     def close(self):
         self.env.close()
@@ -238,6 +278,7 @@ class Voyager:
                 chest_observation=self.action_agent.render_chest_observation(),
                 max_retries=5,
             )
+            self._record_attempt(code, events, success, critique)
 
             if self.reset_placed_if_failed and not success:
                 # revert all the placing event in the last step
@@ -265,7 +306,7 @@ class Voyager:
                 events=events,
                 code=parsed_result["program_code"],
                 task=self.task,
-                context=self.context,
+                context=self._context_with_lessons(),
                 critique=critique,
             )
             self.last_events = copy.deepcopy(events)
@@ -324,16 +365,18 @@ class Voyager:
             )
             self.resume = True
         self.last_events = self.env.step("")
+        if self.evolve:
+            self.skill_manager.consolidate()
 
         while True:
             if self.recorder.iteration > self.max_iterations:
                 print("Iteration limit reached")
                 break
-            task, context = self.curriculum_agent.propose_next_task(
-                events=self.last_events,
-                chest_observation=self.action_agent.render_chest_observation(),
-                max_retries=5,
-            )
+            if self.evolve and self._since_repair >= self.repair_every:
+                self._since_repair = 0
+                if self.repair_weakest_skill(reset_env):
+                    continue
+            task, context = self._propose_task()
             print(
                 f"\033[35mStarting task {task} for at most {self.action_agent_task_max_retries} times\033[0m"
             )
@@ -367,6 +410,8 @@ class Voyager:
 
             if info["success"]:
                 self.skill_manager.add_new_skill(info)
+            self._learn_lessons(task, info["success"])
+            self._since_repair += 1
 
             self.curriculum_agent.update_exploration_progress(info)
             print(
@@ -382,6 +427,77 @@ class Voyager:
             "failed_tasks": self.curriculum_agent.failed_tasks,
             "skills": self.skill_manager.skills,
         }
+
+    # ------------------------------------------------------------------ evolution helpers
+    def _propose_task(self):
+        """Ask the curriculum for a task, refusing ones that already failed twice."""
+        cur = self.curriculum_agent
+        task = context = None
+        for _ in range(3):
+            task, context = cur.propose_next_task(
+                events=self.last_events,
+                chest_observation=self.action_agent.render_chest_observation(),
+                max_retries=5,
+            )
+            if not self.evolve or cur.failed_tasks.count(task) < 2:
+                break
+            print(f"\033[35mSkipping '{task}': it has already failed {cur.failed_tasks.count(task)} times\033[0m")
+            hopeless = sorted({t for t in cur.failed_tasks if cur.failed_tasks.count(t) >= 2})
+            cur.extra_note = (
+                "These tasks failed repeatedly; do NOT propose them or close variants of them: "
+                + "; ".join(hopeless) + "\n\n"
+            )
+        cur.extra_note = ""
+        return task, context
+
+    def _learn_lessons(self, task, success):
+        if not self.lessons or not self._attempts:
+            return
+        if success and len(self._attempts) < 2:
+            return  # first-try successes rarely teach anything new
+        for lesson in self.lessons.learn(task, self._attempts, success):
+            print(f"\033[36mLearned lesson: {lesson}\033[0m")
+
+    def repair_weakest_skill(self, reset_env=True):
+        """Rewrite the skill with the worst track record; keep the new version only if it works."""
+        sm = self.skill_manager
+        name = sm.stats.weakest(sm.skills)
+        if not name:
+            return False
+        stats = sm.stats.d[name]
+        stats["repairs"] += 1
+        sm.stats.save()
+        entry = sm.skills[name]
+        task = entry.get("task")
+        if not task:
+            desc = entry["description"].split("//", 1)[-1].rsplit("}", 1)[0].strip()
+            task = desc.split(". ")[0].rstrip(".")
+        problems = "\n".join(f"- {n}" for n in stats["notes"]) or "- (no details recorded)"
+        context = (
+            f"This task rewrites the existing skill `{name}`, which failed {stats['fails']} of its "
+            f"{stats['uses']} recent uses. Recent problems:\n{problems}\n\nCurrent code:\n{entry['code']}\n\n"
+            f"Write a more reliable version. Name the main function exactly `{name}` and do not call `{name}` itself."
+        )
+        print(f"\033[35mRepairing weak skill {name} via task: {task}\033[0m")
+        try:
+            _, _, _, info = self.rollout(task=task, context=context, reset_env=reset_env)
+        except BudgetExceeded:
+            raise
+        except Exception as e:
+            print(f"\033[41mRepair of {name} crashed: {e}\033[0m")
+            self.last_events = self.env.reset(options={"mode": "soft", "wait_ticks": self.env_wait_ticks})
+            return True
+        if info["success"]:
+            code = info["program_code"]
+            if info["program_name"] != name:
+                code = re.sub(r"async\s+function\s+" + re.escape(info["program_name"]) + r"\s*\(",
+                              f"async function {name}(", code, count=1)
+            sm.add_new_skill({"task": task, "program_name": name, "program_code": code, "repair": True})
+            print(f"\033[35mRepaired skill {name}\033[0m")
+        else:
+            print(f"\033[35mCould not repair {name}; keeping the current version\033[0m")
+        self._learn_lessons(task, info["success"])
+        return True
 
     def decompose_task(self, task):
         if not self.last_events:

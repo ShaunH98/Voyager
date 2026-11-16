@@ -77,6 +77,23 @@ The failures that remain are mostly bad luck with terrain:
 
 The paper libraries failed mainly on 1.18→1.19 changes, hard-coded counts, and hangs while pathfinding or digging. Raw results are in `tests/results/`.
 
+### Evolution (`voyager/evolution.py`, on by default; `--no-evolve` to turn off)
+
+Plain Voyager learns by saving every successful program as a new skill. On a long run that piles up near-duplicates and repeats the same mistakes. Evolution adds five things:
+
+1. **Fitness.** Each time a program calls a library skill, the run records whether that attempt succeeded.
+   - Skill search prefers skills with a good track record.
+   - The LLM sees each skill's record, for example `// track record: 5 of 6 uses succeeded`.
+   - Records are kept in `skill/fitness.json`.
+2. **Merging.** Skills that differ only by a hard-coded amount are merged into one general skill. For example, `mineThreeIronOre`, `mineFourIronOre` and `mineFiveIronOre` become `mineIronOre(bot, count = 3)`.
+   - Learned variants of a core skill aren't added at all.
+   - Removed skills are *retired* (`skill/retired.json`): old code can still call them, but they're no longer offered to the LLM.
+3. **Lessons.** After a failed task, or a success that took several tries, the LLM writes up to two short, general lessons. The most relevant ones are shown to the action agent on later tasks. Lessons are kept in `lessons/` next to the skill library.
+4. **Self-repair.** Every 6 tasks, the skill with the worst record is rewritten as a task of its own. The new version replaces the old one only if the critic confirms it works.
+5. **No dead ends.** A task that has failed twice is refused, and the curriculum is told to propose something else.
+
+New learning runs start from a copy of `skill_library/core` (`--seed-skills`), so they build on the tested skills instead of relearning the basics.
+
 ## Quick start (Windows)
 
 ```bash
