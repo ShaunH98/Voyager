@@ -119,6 +119,22 @@ The original Voyager never builds anything, because the AI that checks each task
 
 `tests/debug_run.py` runs any snippet on the test server and prints what the bot said, for debugging.
 
+Building benchmark (fresh terrain each time, final runs):
+
+| Task | Result |
+|---|---|
+| Build a home with materials provided | Pass, about 1 minute, 105/105 blocks |
+| Build a home with only stone tools | Pass, about 10 minutes. It mines cobblestone, kills sheep for a bed, and makes a chest, furnace and door. |
+| Sleep at home at night | Pass |
+| Store items at home (builds the chests first) | Pass, about 15 seconds |
+| Wheat farm | Pass, about 100 seconds: 114/114 blocks and 48/48 tiles tilled and planted |
+| Cow pen + lead 2 cows in | Pass, about 1 minute |
+
+**Known weak spots:**
+- Odd terrain such as deserts, ice spikes and steep hills slows building down, and occasionally beats it.
+- Harvesting tramples a few farm tiles, which get re-tilled next time.
+- Torches are only added if the bot already has coal.
+
 ## Quick start (Windows)
 
 ```bash

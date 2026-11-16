@@ -262,7 +262,9 @@ function _V_blueprint(type) {
                     add(x, -1, z, "*solid");
                     if (!(x === 4 && z === 0)) add(x, 0, z, "fence", { phase: 3 });
                 } else if (x === 4 && z === 4) add(x, -1, z, "water", { phase: 1 });
-                else add(x, -1, z, "farmland", { phase: 2, optional: true }); // re-tilled from inside when planting
+                // the pathfinder hops when stepping between farmland and dirt, which tramples some
+                // tiles back to dirt; buildWheatFarm re-tills those from inside while planting
+                else add(x, -1, z, "farmland", { phase: 2, optional: true });
             }
         add(4, -1, -1, "*solid");
         add(4, 0, 0, "fence_gate", { phase: 4, stand: [4, 0, -2] });
@@ -307,6 +309,7 @@ function _V_ok(block, want) {
         case "fence_gate": return n.endsWith("_fence_gate");
         case "torch": return n === "torch" || n === "wall_torch";
         case "farmland": return n === "farmland";
+        case "wheat": return n === "wheat";
         case "water": return n === "water";
         default: return n === want;
     }
@@ -324,6 +327,7 @@ function _V_itemFor(bot, want) {
         case "door": return pick((i) => i.name.endsWith("_door") && i.name !== "iron_door");
         case "fence": return pick((i) => i.name.endsWith("_fence") && i.name !== "nether_brick_fence");
         case "fence_gate": return pick((i) => i.name.endsWith("_fence_gate"));
+        case "wheat": return pick((i) => i.name === "wheat_seeds");
         default: return pick((i) => i.name === want);
     }
 }
@@ -377,7 +381,7 @@ function _V_need(bot, bp, O) {
         const b = bot.blockAt(pos);
         if (b && _V_ok(b, e.b)) continue;
         // optional extras (torches) are placed if we happen to have them; never worth a trip
-        if (e.optional && !_V_itemFor(bot, e.b)) continue;
+        if (e.optional) continue;
         if (e.b === "farmland") {
             if (b && _V_SOIL.includes(b.name)) continue; // only needs a hoe
             need.fill = (need.fill || 0) + 1;
@@ -404,7 +408,8 @@ async function _V_gatherFor(bot, need) {
             if (!_V_has(bot, "water_bucket") && !(await collectWater(bot))) return false;
             continue;
         }
-        const have = _V_haveFor(bot, k);
+        let have = _V_haveFor(bot, k);
+        if (k === "fill") have += Math.max(0, _V_haveFor(bot, "wall") - (need.wall || 0)); // spare stone fills holes too
         if (have >= n) continue;
         const name = _V_obtainNameFor(bot, k);
         bot.chat(`Gathering ${n - have} ${k === "fill" ? "dirt" : k} for building`);
@@ -465,7 +470,7 @@ async function _V_clearCell(bot, pos, keepIf) {
     return !a || _V_AIR.has(a.name);
 }
 
-async function _V_till(bot, pos) {
+async function _V_till(bot, pos, stand = null) {
     let g = bot.blockAt(pos);
     if (g && g.name === "farmland") return true;
     const above = pos.offset(0, 1, 0);
@@ -477,7 +482,8 @@ async function _V_till(bot, pos) {
     }
     const hoe = bot.inventory.items().find((i) => i.name.endsWith("_hoe"));
     if (!hoe) return false;
-    await _V_reach(bot, pos);
+    if (stand) await _V_travel(bot, stand, 0, 15000);
+    await _V_reach(bot, pos, 4.5);
     await bot.equip(hoe, "hand");
     for (let i = 0; i < 2 && bot.blockAt(pos).name !== "farmland"; i++) {
         await bot.activateBlock(bot.blockAt(pos)).catch((e) => console.log(`[till] activate error ${e.message}`));
@@ -512,7 +518,7 @@ async function _V_pourWater(bot, pos) {
 async function _V_placeAt(bot, pos, want, opts = {}) {
     let cur = bot.blockAt(pos);
     if (cur && _V_ok(cur, want)) return true;
-    if (want === "farmland") return _V_till(bot, pos);
+    if (want === "farmland") return _V_till(bot, pos, opts.stand);
     if (want === "water") return _V_pourWater(bot, pos);
     if (cur && !_V_AIR.has(cur.name) && !(await _V_clearCell(bot, pos))) return false;
     const item = _V_itemFor(bot, want);
@@ -545,8 +551,11 @@ async function _V_buildBlueprint(bot, bp, O, maxSeconds = 600) {
     // while building, the pathfinder may not dig or drop scaffolding inside the site
     const noPlace = (b) => (b && b.position && _V_inBox(b.position, box) ? 1000 : 0);
     const noBreak = (b) => (b && b.position && _V_inBox(b.position, box) ? 100 : 0);
+    const stepBox = bp.noStep ? { min: _V_plain(abs(bp.noStep.min)), max: _V_plain(abs(bp.noStep.max)) } : null;
+    const noStep = (b) => (stepBox && b && b.position && _V_inBox(b.position, stepBox) ? 100 : 0);
     mv.exclusionAreasPlace.push(noPlace);
     mv.exclusionAreasBreak.push(noBreak);
+    mv.exclusionAreasStep.push(noStep);
     const stopReflexes = _V_startReflexes(bot);
     try {
         const wantAt = new Map(bp.entries.map((e) => [abs(e.p).toString(), e.b]));
@@ -584,7 +593,7 @@ async function _V_buildBlueprint(bot, bp, O, maxSeconds = 600) {
         }
         // walking (and jumping) over a field tramples farmland back to dirt: touch it up last
         for (const e of bp.entries) {
-            if (e.b === "farmland" && !_V_ok(bot.blockAt(abs(e.p)), e.b) && Date.now() < end) await _V_till(bot, abs(e.p));
+            if (e.b === "farmland" && !_V_ok(bot.blockAt(abs(e.p)), e.b) && Date.now() < end) await _V_till(bot, abs(e.p), e.stand && abs(e.stand));
         }
         const missing = bp.entries.filter((e) => !_V_ok(bot.blockAt(abs(e.p)), e.b));
         for (const e of missing.slice(0, 12)) console.log(`[build] missing ${e.b} at ${JSON.stringify(e.p)}: found ${bot.blockAt(abs(e.p))?.name}`);
@@ -594,6 +603,7 @@ async function _V_buildBlueprint(bot, bp, O, maxSeconds = 600) {
         stopReflexes();
         mv.exclusionAreasPlace = mv.exclusionAreasPlace.filter((f) => f !== noPlace);
         mv.exclusionAreasBreak = mv.exclusionAreasBreak.filter((f) => f !== noBreak);
+        mv.exclusionAreasStep = mv.exclusionAreasStep.filter((f) => f !== noStep);
     }
 }
 
@@ -677,12 +687,16 @@ async function buildWheatFarm(bot) {
     const built = await buildStructure(bot, "farm");
     const farm = _V_structure(bot, "farm");
     if (!farm) return false;
-    await _V_plantFarm(bot, farm);
     const box = farm.box;
-    let tilled = 0;
-    for (let x = box.min.x + 1; x <= box.max.x - 1; x++)
-        for (let z = box.min.z + 1; z <= box.max.z - 1; z++)
-            if (bot.blockAt(new Vec3(x, farm.origin.y - 1, z))?.name === "farmland") tilled++;
+    const countTilled = () => {
+        let n = 0;
+        for (let x = box.min.x + 1; x <= box.max.x - 1; x++)
+            for (let z = box.min.z + 1; z <= box.max.z - 1; z++)
+                if (bot.blockAt(new Vec3(x, farm.origin.y - 1, z))?.name === "farmland") n++;
+        return n;
+    };
+    await _V_plantFarm(bot, farm); // in through the gate: re-till trampled tiles and plant
+    const tilled = countTilled();
     bot.chat(`Farm has ${tilled}/48 tilled tiles`);
     return built && tilled >= 44;
 }

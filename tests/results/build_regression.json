@@ -1,0 +1,133 @@
+{
+  "library": "skill_library\\core",
+  "passed": 7,
+  "total": 14,
+  "results": [
+    {
+      "ok": true,
+      "died": false,
+      "secs": 12.2,
+      "err": null,
+      "id": "wooden_pickaxe",
+      "skill": "craftWoodenPickaxe",
+      "wall": 20.0
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 29.757,
+      "err": null,
+      "id": "stone_pickaxe",
+      "skill": "craftStonePickaxe",
+      "wall": 37.8
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 8.267,
+      "err": null,
+      "id": "stone_tools",
+      "skill": "craftStoneTools",
+      "wall": 15.6
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 45.493,
+      "err": null,
+      "id": "furnace",
+      "skill": "craftFurnace",
+      "wall": 52.5
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 30.768,
+      "err": null,
+      "id": "torches",
+      "skill": "craftTorches",
+      "wall": 37.3
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 242.003,
+      "err": null,
+      "id": "chest",
+      "skill": "craftChest",
+      "wall": 249.2
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 58.831,
+      "err": null,
+      "id": "iron_pickaxe",
+      "skill": "craftIronPickaxe",
+      "wall": 68.0
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 241.749,
+      "err": null,
+      "id": "shield",
+      "skill": "craftShield",
+      "wall": 248.2
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 375.863,
+      "err": null,
+      "id": "wool_bed",
+      "skill": "craftWhiteBed",
+      "wall": 383.9
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 48.535,
+      "err": null,
+      "id": "build_home",
+      "skill": "buildHomeBase",
+      "wall": 54.8
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 111.297,
+      "err": null,
+      "id": "sleep_home",
+      "skill": "sleepInHomeBed",
+      "wall": 118.8
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 7.043,
+      "err": null,
+      "id": "store_items",
+      "skill": "storeItemsAtHome",
+      "wall": 14.9
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 160.453,
+      "err": null,
+      "id": "wheat_farm",
+      "skill": "buildFarmAtHome",
+      "wall": 168.4
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": null,
+      "err": "ReadTimeout: HTTPConnectionPool(host='127.0.0.1', port=3010): Read timed out. (read timeout=600)",
+      "id": "cow_pen",
+      "skill": "buildCowPen",
+      "wall": 600.6
+    }
+  ]
+}

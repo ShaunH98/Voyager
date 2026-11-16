@@ -1,0 +1,97 @@
+{
+  "library": "skill_library\\core",
+  "passed": 6,
+  "total": 10,
+  "results": [
+    {
+      "ok": false,
+      "died": false,
+      "secs": null,
+      "err": "ReadTimeout: HTTPConnectionPool(host='127.0.0.1', port=3010): Read timed out. (read timeout=420)",
+      "id": "stone_tools",
+      "skill": "craftStoneTools",
+      "wall": 418.7
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 48.579,
+      "err": null,
+      "id": "furnace",
+      "skill": "craftFurnace",
+      "wall": 56.0
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 14.676,
+      "err": null,
+      "id": "chest",
+      "skill": "craftChest",
+      "wall": 24.2
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 241.395,
+      "err": null,
+      "id": "shield",
+      "skill": "craftShield",
+      "wall": 248.6
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 164.005,
+      "err": null,
+      "id": "wool_bed",
+      "skill": "craftWhiteBed",
+      "wall": 172.2
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 120.243,
+      "err": null,
+      "id": "build_home",
+      "skill": "buildHomeBase",
+      "wall": 128.0
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 93.045,
+      "err": null,
+      "id": "sleep_home",
+      "skill": "sleepInHomeBed",
+      "wall": 99.7
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 6.46,
+      "err": null,
+      "id": "store_items",
+      "skill": "storeItemsAtHome",
+      "wall": 14.8
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 160.729,
+      "err": null,
+      "id": "wheat_farm",
+      "skill": "buildFarmAtHome",
+      "wall": 168.7
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 60.315,
+      "err": null,
+      "id": "cow_pen",
+      "skill": "buildCowPen",
+      "wall": 69.3
+    }
+  ]
+}

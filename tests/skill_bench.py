@@ -45,7 +45,7 @@ bot.chat("/difficulty {task.get('difficulty', 'peaceful')}");
 bot.chat("/time set {task.get('time', 'day')}");
 bot.chat("/weather clear");
 bot.chat("/effect clear @s");
-bot.chat("/spreadplayers {x} {z} 0 {task.get('spread', 30)} false @s");
+bot.chat("/spreadplayers {x} {z} 0 {task.get('spread', 160)} false @s");
 await bot.waitForTicks(40);
 await bot.waitForChunksToLoad();
 await bot.waitForTicks(20);
