@@ -94,6 +94,31 @@ Plain Voyager learns by saving every successful program as a new skill. On a lon
 
 New learning runs start from a copy of `skill_library/core` (`--seed-skills`), so they build on the tested skills instead of relearning the basics.
 
+### Building and a home base (`voyager/control_primitives/building.js`)
+
+The original Voyager never builds anything, because the AI that checks each task can't see the world. This fork builds from fixed **blueprints**. It gathers every material itself (using `obtainItem`) and checks every block afterwards, so a "built" report is real.
+
+| Structure / action | What it does |
+|---|---|
+| `buildHome` | Finds flat, dry ground and builds a 5×5 cobblestone cottage with a plank roof, a door, a bed, a chest, a crafting table, a furnace and torches. It becomes **home**. |
+| `sleepAtHome` | At night: walks home, opens the door, goes in and sleeps in the bed. `surviveNight` now does this first when home is within 96 blocks. |
+| `storeItems` | Builds 4 storage chests next to home if there are none, then deposits junk and surplus blocks. The curriculum triggers it when the inventory is nearly full. |
+| `buildWheatFarm`, `harvestFarm` | Builds a fenced 7×7 field watered from the centre, then tills it, plants it, harvests it and replants it. |
+| `buildAnimalPen`, `breedAnimals` | Builds a fenced pen, then leads animals in by holding their food. It leaves the gate open until they're inside, then shuts it. |
+
+**How it works:**
+- **Memory:** the base (where home is, and what has been built) is remembered across restarts in `<ckpt>/base.json`.
+- **Protection:** the pathfinder is never allowed to dig through the bot's own buildings.
+- **Curriculum:** it may now propose these specific building tasks when there is a real need, and it is told what has already been built.
+- **Checking:** building tasks are judged by the builder's own block-by-block report, not by the language-model critic.
+
+**Bug fixes found along the way:**
+- Crafting in bulk (for example 31 fences) failed after the first item when the server was slow. It now falls back to one-at-a-time crafting and keeps going for as long as it makes progress.
+- Placing a crafting table could pick a bed as the surface underneath it.
+- In snowy biomes, snow layers and tall grass counted as occupied, so it couldn't find anywhere to place a crafting table.
+
+`tests/debug_run.py` runs any snippet on the test server and prints what the bot said, for debugging.
+
 ## Quick start (Windows)
 
 ```bash

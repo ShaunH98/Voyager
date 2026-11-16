@@ -167,12 +167,21 @@ function _V_placeSpot(bot) {
         const at = bot.blockAt(p);
         const below = bot.blockAt(p.offset(0, -1, 0));
         const above = bot.blockAt(p.offset(0, 1, 0));
-        if (at && below && above && (at.name === "air" || at.name === "cave_air") && below.boundingBox === "block" &&
-            !["water", "lava"].includes(below.name) && (above.name === "air" || above.name === "cave_air")) {
+        // never use a bed, chest, door... as the surface: right-clicking those opens or uses them.
+        // snow layers, grass and flowers count as free: a placed block simply replaces them
+        if (at && below && above && _V_replaceable(at) && below.boundingBox === "block" &&
+            !["water", "lava"].includes(below.name) && !/(chest|_bed|_door|_fence_gate|crafting_table|furnace|barrel|_sign|trapdoor|_fence)$/.test(below.name) &&
+            _V_replaceable(above)) {
             return { pos: p, ref: below };
         }
     }
     return null;
+}
+
+function _V_replaceable(b) {
+    return ["air", "cave_air", "snow", "grass", "tall_grass", "fern", "large_fern", "dead_bush", "dandelion", "poppy",
+        "cornflower", "azure_bluet", "oxeye_daisy", "allium", "blue_orchid", "lily_of_the_valley", "sweet_berry_bush"].includes(b.name) ||
+        b.name.endsWith("_tulip");
 }
 
 // place a station (crafting_table / furnace) from inventory next to the bot; returns the block

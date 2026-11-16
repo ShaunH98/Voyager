@@ -36,6 +36,7 @@ def build_code(task, call, slot):
     setup = "\n".join(f"bot.chat({json.dumps(c)}); await bot.waitForTicks(4);" for c in task.get("commands", []))
     return f"""
 let __died = false;
+bot._V_base = null; globalThis.__slept = undefined; globalThis.__p = undefined;
 bot.once("death", () => {{ __died = true; }});
 const count = (re) => bot.inventory.slots.slice(5, 46).filter(i => i).filter(i => new RegExp("^(" + re + ")$").test(i.name)).reduce((a, i) => a + i.count, 0);
 const armor = (s) => (bot.inventory.slots[{{head: 5, chest: 6, legs: 7, feet: 8}}[s]] || {{}}).name;

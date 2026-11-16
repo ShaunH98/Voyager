@@ -42,6 +42,7 @@ class CurriculumAgent:
         ], f"mode {mode} not supported"
         self.mode = mode
         self.extra_note = ""  # set by Voyager to steer away from hopeless tasks
+        self.base_note = ""  # set by Voyager: what the bot has built so far
         self.ckpt_dir = ckpt_dir
         U.f_mkdir(f"{ckpt_dir}/curriculum/vectordb")
         if resume:
@@ -233,7 +234,7 @@ class CurriculumAgent:
                     should_include = True
                 if should_include:
                     content += observation[key]
-        content += self.extra_note
+        content += self.base_note + self.extra_note
 
         print(f"\033[35m****Curriculum Agent human message****\n{content}\033[0m")
         return HumanMessage(content=content)

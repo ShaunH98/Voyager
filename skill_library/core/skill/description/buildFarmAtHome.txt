@@ -1,0 +1,3 @@
+async function buildFarmAtHome(bot) {
+    // Build a fenced, watered 7x7 wheat farm near home, till it and plant all the seeds held.
+}

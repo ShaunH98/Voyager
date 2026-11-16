@@ -1,0 +1,3 @@
+async function buildHomeBase(bot) {
+    // Build a home: a 5x5 stone cottage with a bed, chest, crafting table, furnace and door near here; it becomes home.
+}

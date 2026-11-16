@@ -173,6 +173,9 @@ class Voyager:
 
         # evolution (see voyager/evolution.py): lessons live next to the skill library
         self.evolve = evolve
+        # home base memory (what the bot has built, where home is), kept per world
+        self.base_path = f"{ckpt_dir}/base.json"
+        self.base = U.load_json(self.base_path) if resume and os.path.exists(self.base_path) else None
         self.repair_every = repair_every
         self._since_repair = 0
         self._attempts = []
@@ -235,6 +238,58 @@ class Voyager:
         self.conversations = []
         return self.messages
 
+    def _programs(self):
+        base = json.dumps(self.base) if self.base else "null"
+        return (
+            f"var _V_BASE_SAVED = {base};\n"
+            + self.skill_manager.programs
+            + "\ntry { getBase(bot); } catch (e) {}\n"
+        )
+
+    def _absorb_base(self, events):
+        for t, e in events:
+            s = e.get("onSave") if t == "onSave" else None
+            if s and s.startswith("base:"):
+                try:
+                    self.base = json.loads(s[5:])
+                except json.JSONDecodeError:
+                    continue
+                U.dump_json(self.base, self.base_path)
+
+    @staticmethod
+    def _verification_marker(task):
+        t = (task or "").lower()
+        if "sleep" in t and "home" in t:
+            return "slept"
+        if ("store" in t or "deposit" in t) and "home" in t:
+            return "stored"
+        if not re.search(r"\b(build|construct|make|set up)\b", t):
+            return None
+        if "storage" in t:
+            return "built:storage"
+        if "farm" in t:
+            return "built:farm"
+        if re.search(r"\bpen\b", t):
+            m = re.search(r"\b(cow|sheep|pig|chicken|rabbit|goat|mooshroom)s?\b", t)
+            return f"penned:{m.group(1)}" if m else "built:pen"
+        if re.search(r"\b(home|house|hut|cottage|cabin|base)\b", t):
+            return "built:hut"
+        return None
+
+    def _base_summary(self):
+        b = self.base or {}
+        built = [s for s in b.get("structures", []) if s.get("ok")]
+        if not built:
+            return "Home base: none yet\n\n"
+        names = {"hut": "home (hut with bed, chest, crafting table, furnace)", "storage": "storage chests",
+                 "farm": "wheat farm", "pen": "animal pen"}
+        have = sorted({names.get(s["type"], s["type"]) for s in built})
+        h = b.get("home") or {}
+        where = f" at x={h.get('x')}, y={h.get('y')}, z={h.get('z')}" if h else ""
+        missing = [names[k] for k in ("hut", "storage", "farm", "pen") if k not in {s["type"] for s in built}]
+        return (f"Home base{where}: built {', '.join(have)}"
+                + (f"; not built yet: {', '.join(missing)}" if missing else "") + "\n\n")
+
     def _context_with_lessons(self):
         if not self.lesson_text:
             return self.context
@@ -267,7 +322,7 @@ class Voyager:
             code = parsed_result["program_code"] + "\n" + parsed_result["exec_code"]
             events = self.env.step(
                 code,
-                programs=self.skill_manager.programs,
+                programs=self._programs(),
             )
             self.recorder.record(events, self.task)
             self.action_agent.update_chest_memory(events[-1][1]["nearbyChests"])
@@ -278,6 +333,17 @@ class Voyager:
                 chest_observation=self.action_agent.render_chest_observation(),
                 max_retries=5,
             )
+            self._absorb_base(events)
+            marker = self._verification_marker(self.task)
+            if marker:
+                # building / home tasks are checked by the builder itself, block by block
+                saves = [e["onSave"] for t, e in events if t == "onSave" and e.get("onSave")]
+                success = any(s == marker or s.startswith(marker) for s in saves)
+                critique = "" if success else (
+                    f"Not confirmed: the code never reported '{marker}'. Use the building functions "
+                    f"(buildHome, buildStorage, storeItems, buildWheatFarm, buildAnimalPen, sleepAtHome) "
+                    f"and read their chat messages to see what was missing."
+                )
             self._record_attempt(code, events, success, critique)
 
             if self.reset_placed_if_failed and not success:
@@ -292,7 +358,7 @@ class Voyager:
                         positions.append(position)
                 new_events = self.env.step(
                     f"await givePlacedItemBack(bot, {U.json_dumps(blocks)}, {U.json_dumps(positions)})",
-                    programs=self.skill_manager.programs,
+                    programs=self._programs(),
                 )
                 events[-1][1]["inventory"] = new_events[-1][1]["inventory"]
                 events[-1][1]["voxels"] = new_events[-1][1]["voxels"]
@@ -433,6 +499,14 @@ class Voyager:
         """Ask the curriculum for a task, refusing ones that already failed twice."""
         cur = self.curriculum_agent
         task = context = None
+        cur.base_note = self._base_summary()
+        inv_used = self.last_events[-1][1]["status"]["inventoryUsed"] if self.last_events else 0
+        has_home = any(s.get("type") == "hut" and s.get("ok") for s in (self.base or {}).get("structures", []))
+        if has_home and inv_used >= 30 and cur.failed_tasks.count("Store items at home") < 2:
+            return "Store items at home", (
+                f"My inventory has {inv_used}/36 slots used. Call `await storeItems(bot);` to take junk and "
+                "surplus blocks to the storage chests at home (it builds them if needed)."
+            )
         for _ in range(3):
             task, context = cur.propose_next_task(
                 events=self.last_events,

@@ -416,16 +416,23 @@ async function _V_craft(bot, name, count, depth) {
 async function _V_doCraft(bot, item, count, table) {
     bot.pathfinder.setGoal(null);
     if (bot.currentWindow) bot.closeWindow(bot.currentWindow);
-    for (let attempt = 0; attempt < 3 && _V_count(bot, item.name) < count; attempt++) {
+    // mineflayer's multi-craft often breaks after the first item ("missing ingredient") because it
+    // reads the inventory before the server has updated it: after one hiccup, craft one at a time and
+    // keep going as long as each craft makes progress
+    let fails = 0;
+    let batch = true;
+    while (_V_count(bot, item.name) < count && fails < 4) {
         const recipe = bot.recipesFor(item.id, null, 1, table)[0];
         if (!recipe) break;
-        const times = attempt === 0 ? Math.ceil((count - _V_count(bot, item.name)) / recipe.result.count) : 1;
+        const before = _V_count(bot, item.name);
+        const times = batch ? Math.ceil((count - before) / recipe.result.count) : 1;
         try {
             await bot.craft(recipe, times, table);
         } catch (e) {
-            if (attempt === 2) bot.chat(`Crafting ${item.name} failed: ${e.message}`);
+            batch = false;
             if (bot.currentWindow) bot.closeWindow(bot.currentWindow);
-            await bot.waitForTicks(10);
+            await bot.waitForTicks(6);
+            if (_V_count(bot, item.name) <= before && ++fails >= 4) bot.chat(`Crafting ${item.name} failed: ${e.message}`);
         }
         await bot.waitForTicks(4); // let the inventory catch up before counting
     }

@@ -1,0 +1,3 @@
+async function breedTwoCows(bot) {
+    // Feed two adult cows wheat so they breed.
+}

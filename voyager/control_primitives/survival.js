@@ -211,6 +211,11 @@ async function _V_surviveNight(bot, maxSeconds) {
     await equipBestGear(bot);
     await eatIfHungry(bot, 16);
     if (_V_hostilesNear(bot, 8).length) await defendSelf(bot, 8, 30);
+    // home is best: a real bed behind a door
+    const hut = _V_structure(bot, "hut");
+    if (hut && hut.ok && _V_v(hut.origin).distanceTo(bot.entity.position) < 96) {
+        if (await sleepAtHome(bot, maxSeconds).catch(() => false)) return true;
+    }
     // sleep if we have a bed and it's safe
     const bed = bot.inventory.items().find((it) => it.name.endsWith("_bed"));
     if (bed) {

@@ -1,0 +1,3 @@
+async function sleepInHomeBed(bot) {
+    // At night, walk home, go inside through the door and sleep in the bed.
+}

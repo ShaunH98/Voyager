@@ -179,6 +179,34 @@
     "code": "async function prepareForNight(bot) {\n  await getFood(bot, 4);\n  await obtainItem(bot, \"stone_sword\", 1);\n  await obtainItem(bot, \"torch\", 8);\n  await equipBestGear(bot);\n}",
     "description": "async function prepareForNight(bot) {\n    // Before dark: get 4 cooked food, 8 torches, a stone sword and wear the best gear.\n}"
   },
+  "buildHomeBase": {
+    "code": "async function buildHomeBase(bot) {\n  await buildHome(bot);\n}",
+    "description": "async function buildHomeBase(bot) {\n    // Build a home: a 5x5 stone cottage with a bed, chest, crafting table, furnace and door near here; it becomes home.\n}"
+  },
+  "sleepInHomeBed": {
+    "code": "async function sleepInHomeBed(bot) {\n  await sleepAtHome(bot);\n}",
+    "description": "async function sleepInHomeBed(bot) {\n    // At night, walk home, go inside through the door and sleep in the bed.\n}"
+  },
+  "storeItemsAtHome": {
+    "code": "async function storeItemsAtHome(bot) {\n  await storeItems(bot);\n}",
+    "description": "async function storeItemsAtHome(bot) {\n    // Take junk and surplus blocks home and put them in the storage chests (building them if needed).\n}"
+  },
+  "buildFarmAtHome": {
+    "code": "async function buildFarmAtHome(bot) {\n  await buildWheatFarm(bot);\n}",
+    "description": "async function buildFarmAtHome(bot) {\n    // Build a fenced, watered 7x7 wheat farm near home, till it and plant all the seeds held.\n}"
+  },
+  "harvestHomeFarm": {
+    "code": "async function harvestHomeFarm(bot) {\n  await harvestFarm(bot);\n}",
+    "description": "async function harvestHomeFarm(bot) {\n    // Harvest the ripe wheat at the home farm and replant it.\n}"
+  },
+  "buildCowPen": {
+    "code": "async function buildCowPen(bot) {\n  await buildAnimalPen(bot, \"cow\", 2);\n}",
+    "description": "async function buildCowPen(bot) {\n    // Build a fenced animal pen near home and lead 2 cows into it with wheat.\n}"
+  },
+  "breedTwoCows": {
+    "code": "async function breedTwoCows(bot) {\n  await breedAnimals(bot, \"cow\");\n}",
+    "description": "async function breedTwoCows(bot) {\n    // Feed two adult cows wheat so they breed.\n}"
+  },
   "buildEmergencyShelter": {
     "code": "async function buildEmergencyShelter(bot) {\n  await buildShelter(bot);\n}",
     "description": "async function buildEmergencyShelter(bot) {\n    // Dig into the ground and seal the hole above to hide from mobs immediately.\n}"

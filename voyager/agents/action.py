@@ -78,6 +78,7 @@ class ActionAgent:
             "obtainItem",
             "survival",
             "farming",
+            "building",
             "exploreUntil",
             "mineBlock",
             "craftItem",

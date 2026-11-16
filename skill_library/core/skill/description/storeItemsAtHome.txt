@@ -1,0 +1,3 @@
+async function storeItemsAtHome(bot) {
+    // Take junk and surplus blocks home and put them in the storage chests (building them if needed).
+}

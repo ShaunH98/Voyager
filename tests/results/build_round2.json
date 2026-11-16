@@ -1,0 +1,61 @@
+{
+  "library": "skill_library\\core",
+  "passed": 4,
+  "total": 6,
+  "results": [
+    {
+      "ok": true,
+      "died": false,
+      "secs": 99.954,
+      "err": null,
+      "id": "build_home",
+      "skill": "buildHomeBase",
+      "wall": 106.8
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 100.561,
+      "err": null,
+      "id": "sleep_home",
+      "skill": "sleepInHomeBed",
+      "wall": 106.2
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 6.481,
+      "err": null,
+      "id": "store_items",
+      "skill": "storeItemsAtHome",
+      "wall": 13.7
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 94.701,
+      "err": null,
+      "id": "wheat_farm",
+      "skill": "buildFarmAtHome",
+      "wall": 103.1
+    },
+    {
+      "ok": true,
+      "died": false,
+      "secs": 51.079,
+      "err": null,
+      "id": "cow_pen",
+      "skill": "buildCowPen",
+      "wall": 59.6
+    },
+    {
+      "ok": false,
+      "died": false,
+      "secs": 988.092,
+      "err": null,
+      "id": "home_from_scratch",
+      "skill": "buildHomeBase",
+      "wall": 995.2
+    }
+  ]
+}

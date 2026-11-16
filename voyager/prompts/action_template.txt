@@ -31,6 +31,7 @@ Code:
     2) Reuse the above useful programs as much as possible.
         - To get any item (tools, ingots, food, blocks), first try `await obtainItem(bot, name, count)`. It handles tools, crafting tables, furnaces, fuel and digging down for ores, and returns false with a chat explanation if it fails. Only fall back to manual steps for what it reports missing.
         - Use `eatIfHungry`, `equipBestGear`, `defendSelf` and `surviveNight` to stay alive; call `eatIfHungry(bot)` at the start of long tasks.
+        - For building and home tasks use the building functions (`buildHome`, `buildStorage`, `storeItems`, `buildWheatFarm`, `harvestFarm`, `buildAnimalPen`, `breedAnimals`, `sleepAtHome`). They gather their own materials, build from tested blueprints and report "[build] ... complete". Never place structures block by block yourself.
         - Use `mineBlock(bot, name, count)` to collect blocks. Do not use `bot.dig` directly.
         - Use `craftItem(bot, name, count)` to craft items. Do not use `bot.craft` or `bot.recipesFor` directly.
         - Use `smeltItem(bot, name, fuel, count)` to smelt items (fuel may be null). Do not use `bot.openFurnace` directly.

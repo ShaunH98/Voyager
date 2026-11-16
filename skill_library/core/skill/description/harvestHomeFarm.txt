@@ -1,0 +1,3 @@
+async function harvestHomeFarm(bot) {
+    // Harvest the ripe wheat at the home farm and replant it.
+}
