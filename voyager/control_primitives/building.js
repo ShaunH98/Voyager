@@ -472,7 +472,7 @@ function _V_need(bot, bp, O) {
 // for this build. Dropping is the last resort: the bot walks over the items and picks them up again.
 async function _V_makeRoom(bot, need, slots = 4) {
     if (bot.inventory.emptySlotCount() >= slots) return;
-    const junk = (n) => _V_JUNK.includes(n) || n.endsWith("_sapling") || n.endsWith("_tulip");
+    const junk = _V_isJunk;
     const plan = () => {
         let fillLeft = _V_haveFor(bot, "fill") - (need.fill || 0);
         const out = [];
@@ -951,13 +951,19 @@ var _V_JUNK = ["dirt", "gravel", "sand", "red_sand", "andesite", "diorite", "gra
     "dandelion", "poppy", "cornflower", "azure_bluet", "oxeye_daisy", "allium", "blue_orchid", "lily_of_the_valley"];
 var _V_KEEP_MAX = { cobblestone: 32, cobbled_deepslate: 0, stick: 32, wheat_seeds: 32, bone: 8, string: 16, flint: 8 };
 
+// junk: the list above plus odds and ends picked up while digging and fighting
+function _V_isJunk(name) {
+    return _V_JUNK.includes(name) || /_sapling$|_tulip$|_leaves$|_button$|_terracotta$|^polished_(andesite|diorite|granite)$|^(cut_|chiseled_|smooth_)?sandstone$/.test(name) &&
+        !/glazed/.test(name);
+}
+
 function _V_depositList(bot) {
     const out = [];
     const seen = {};
     for (const it of bot.inventory.items()) seen[it.name] = (seen[it.name] || 0) + it.count;
     for (const [name, n] of Object.entries(seen)) {
         let extra = 0;
-        if (_V_JUNK.includes(name) || name.endsWith("_sapling") || name.endsWith("_tulip")) extra = n;
+        if (_V_isJunk(name)) extra = n;
         else if (name in _V_KEEP_MAX) extra = n - _V_KEEP_MAX[name];
         else if (name.endsWith("_planks")) extra = n - 32;
         else if (name.endsWith("_log")) extra = n - 16;
