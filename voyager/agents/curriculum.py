@@ -255,6 +255,9 @@ class CurriculumAgent:
                     if content == " Unknown items inside" or content == " Empty":
                         position = chest.split(":")[0]
                         task = f"Deposit useless items into the chest at {position}"
+                        # a chest it has failed to use twice is unreachable: don't loop on it
+                        if self.failed_tasks.count(task) >= 2:
+                            continue
                         context = (
                             f"Your inventory have {inventoryUsed} occupied slots before depositing. "
                             "After depositing, your inventory should only have 20 occupied slots. "

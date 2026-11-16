@@ -47,6 +47,8 @@ bot.chat("/weather clear");
 bot.chat("/effect clear @s");
 bot.chat("/spreadplayers {x} {z} 0 {task.get('spread', 160)} false @s");
 await bot.waitForTicks(40);
+// a lagging server can run the teleport seconds late: wait until we have actually arrived
+for (let __i = 0; __i < 150 && Math.abs(bot.entity.position.x - {x}) > {task.get('spread', 160)} + 50; __i++) await bot.waitForTicks(4);
 await bot.waitForChunksToLoad();
 await bot.waitForTicks(20);
 {setup}

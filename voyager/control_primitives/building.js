@@ -136,10 +136,14 @@ function _V_ground(bot, x, z, yHint, cache) {
     const key = x + "," + z;
     if (cache.has(key)) return cache.get(key);
     let r = null;
-    for (let y = yHint + 8; y >= yHint - 10; y--) {
+    // look well above the bot: from the sea a beach or cliff top can be 20+ blocks up
+    for (let y = yHint + 24; y >= yHint - 10; y--) {
         const b = bot.blockAt(new Vec3(x, y, z));
         if (!b) break;
-        if (b.name === "water" || b.name === "lava") {
+        // kelp/seagrass/bubble columns are water too (the probe would otherwise call the seabed dry)
+        const wet = b.name === "water" || b.name === "lava" || /kelp|seagrass|bubble_column/.test(b.name) ||
+            (b.getProperties && b.getProperties().waterlogged === true && b.boundingBox !== "block");
+        if (wet) {
             r = { y, liquid: true, name: b.name };
             break;
         }
@@ -150,6 +154,71 @@ function _V_ground(bot, x, z, yHint, cache) {
     }
     cache.set(key, r);
     return r;
+}
+
+// pick the direction with the most dry land within ~128 blocks and return the farthest dry
+// point that way (used when there is no building site nearby, e.g. the bot is out at sea)
+function _V_landDir(bot) {
+    const c = bot.entity.position.floored();
+    const cache = new Map();
+    let best = null;
+    for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * Math.PI * 2;
+        let dry = 0;
+        let far = null;
+        for (let r = 8; r <= 128; r += 6) {
+            const x = Math.round(c.x + Math.cos(a) * r);
+            const z = Math.round(c.z + Math.sin(a) * r);
+            const g = _V_ground(bot, x, z, c.y, cache);
+            if (g && !g.liquid) {
+                dry++;
+                far = new Vec3(x, g.y + 1, z);
+            }
+        }
+        if (far && (!best || dry > best.dry)) best = { dry, far, dir: new Vec3(Math.round(Math.cos(a)), 0, Math.round(Math.sin(a))) };
+    }
+    return best;
+}
+
+// swim (or walk) in a straight line toward a point; the pathfinder barely moves at sea
+async function _V_swimTo(bot, target, ms = 90000) {
+    const end = Date.now() + ms;
+    const tx = target.x + 0.5;
+    const tz = target.z + 0.5;
+    let last = bot.entity.position.clone();
+    let lastT = Date.now();
+    try {
+        while (Date.now() < end) {
+            const p = bot.entity.position;
+            const dh = Math.hypot(p.x - tx, p.z - tz);
+            if (dh < 3) break;
+            if (!bot.entity.isInWater && bot.entity.onGround && dh < 40) break; // ashore: the pathfinder can finish
+            await bot.lookAt(new Vec3(tx, p.y + 1.6, tz), true);
+            bot.setControlState("forward", true);
+            bot.setControlState("sprint", true);
+            bot.setControlState("jump", bot.entity.isInWater || bot.entity.isCollidedHorizontally);
+            await bot.waitForTicks(4);
+            if (Date.now() - lastT > 6000) {
+                if (p.distanceTo(last) < 2) break; // stuck
+                last = p.clone();
+                lastT = Date.now();
+            }
+        }
+    } finally {
+        bot.clearControlStates();
+    }
+}
+
+// no building site here: go toward the most dry land instead of a random direction
+async function _V_headForLand(bot) {
+    const land = _V_landDir(bot);
+    console.log(`[build] heading for land: ${land ? land.far + " (" + land.dry + " dry samples)" : "none seen"}`);
+    if (!land) {
+        await exploreUntil(bot, _V_randomDir(), 40, () => null);
+        return;
+    }
+    if (bot.entity.isInWater || land.dry < 3) await _V_swimTo(bot, land.far, 120000);
+    if (!(await _V_travel(bot, land.far, 3, 60000))) await exploreUntil(bot, land.dir, 30, () => null);
 }
 
 // find a flat, dry w x d spot; returns the origin (standing level; floor is y-1)
@@ -639,11 +708,11 @@ async function buildStructure(bot, type, maxSeconds = 900) {
     }
     if (!O) {
         const near = base.home || null;
-        for (let attempt = 0; attempt < 3 && !O; attempt++) {
+        for (let attempt = 0; attempt < 5 && !O; attempt++) {
             O = _V_findSite(bot, bp.w, bp.d, { near: attempt === 0 ? near : null, radius: attempt === 0 && near ? 32 : 48, margin: 1, soil: bp.soil });
             if (!O) {
-                console.log(`[build] no flat ${bp.w}x${bp.d} site near ${bot.entity.position.floored()}; exploring`);
-                await exploreUntil(bot, _V_randomDir(), 40, () => null);
+                console.log(`[build] no flat ${bp.w}x${bp.d} site near ${bot.entity.position.floored()}`);
+                await _V_headForLand(bot);
             }
         }
     }
@@ -716,7 +785,7 @@ async function _V_plantFarm(bot, farm) {
             const above = bot.blockAt(new Vec3(x, farm.origin.y, z));
             if (!soil || soil.name !== "farmland" || !above || !_V_AIR.has(above.name)) continue;
             const seeds = bot.inventory.findInventoryItem(mcData.itemsByName.wheat_seeds.id);
-            if (!seeds) break;
+            if (!seeds) continue; // out of seeds: keep re-tilling the rest, just don't plant
             await _V_reach(bot, soil.position);
             await bot.equip(seeds, "hand");
             await bot.placeBlock(soil, new Vec3(0, 1, 0)).catch(() => {});
