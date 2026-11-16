@@ -214,8 +214,8 @@ function _V_blueprint(type) {
         // 5x5 cottage: cobblestone walls, plank roof, door facing -z; inside a bed, chest,
         // crafting table, furnace and a torch
         for (let x = 0; x < 5; x++) for (let z = 0; z < 5; z++) add(x, -1, z, "*solid");
-        add(2, -1, -1, "*solid");
-        add(2, -1, -2, "*solid");
+        add(2, -1, -1, "*solid", { optional: true }); // doorstep path
+        add(2, -1, -2, "*solid", { optional: true });
         for (let y = 0; y < 3; y++)
             for (let x = 0; x < 5; x++)
                 for (let z = 0; z < 5; z++) {

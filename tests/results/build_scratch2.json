@@ -1,0 +1,16 @@
+{
+  "library": "skill_library\\core",
+  "passed": 0,
+  "total": 1,
+  "results": [
+    {
+      "ok": false,
+      "died": false,
+      "secs": 201.751,
+      "err": null,
+      "id": "home_from_scratch",
+      "skill": "buildHomeBase",
+      "wall": 210.0
+    }
+  ]
+}

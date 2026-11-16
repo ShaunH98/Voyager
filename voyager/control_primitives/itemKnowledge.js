@@ -154,7 +154,7 @@ function _V_timeLeft() {
 var _V_deadline = null;
 
 // a free spot next to the bot where a block can stand (air with solid ground, not where the bot stands)
-function _V_placeSpot(bot) {
+function _V_placeSpot(bot, skip = null) {
     const base = bot.entity.position.floored();
     const offsets = [];
     for (let r = 1; r <= 3; r++)
@@ -164,6 +164,9 @@ function _V_placeSpot(bot) {
                     if (Math.max(Math.abs(dx), Math.abs(dz)) === r) offsets.push(new Vec3(dx, dy, dz));
     for (const o of offsets) {
         const p = base.plus(o);
+        if (skip && skip.has(p.toString())) continue;
+        // a mob standing there blocks placement
+        if (Object.values(bot.entities).some((e) => e !== bot.entity && e.type === "mob" && e.position.floored().equals(p))) continue;
         const at = bot.blockAt(p);
         const below = bot.blockAt(p.offset(0, -1, 0));
         const above = bot.blockAt(p.offset(0, 1, 0));
@@ -188,8 +191,9 @@ function _V_replaceable(b) {
 async function _V_placeStation(bot, name) {
     const item = bot.inventory.findInventoryItem(mcData.itemsByName[name].id);
     if (!item) return null;
-    for (let attempt = 0; attempt < 4; attempt++) {
-        let spot = _V_placeSpot(bot);
+    const tried = new Set(); // spots that refused a block (an animal in the way, a bad surface...)
+    for (let attempt = 0; attempt < 8; attempt++) {
+        let spot = _V_placeSpot(bot, tried);
         if (!spot && attempt >= 1) {
             // cramped (e.g. a tunnel): dig a 1x2 alcove beside us and use that
             const f = bot.entity.position.floored();
@@ -198,16 +202,18 @@ async function _V_placeStation(bot, name) {
                 const below = bot.blockAt(p.offset(0, -1, 0));
                 if (!below || below.boundingBox !== "block") continue;
                 if ((await _V_digSafe(bot, p)) && (await _V_digSafe(bot, p.offset(0, 1, 0)))) {
-                    spot = _V_placeSpot(bot);
+                    spot = _V_placeSpot(bot, tried);
                     if (spot) break;
                 }
             }
         }
-        if (!spot) {
-            // step aside and try again
+        if (!spot || attempt >= 4) {
+            // step aside (out of water, away from the crowd) and try again
             const p = bot.entity.position;
-            await _V_goto(bot, new GoalNearXZ(p.x + (Math.random() * 6 - 3), p.z + (Math.random() * 6 - 3), 1)).catch(() => {});
-            continue;
+            await _V_goto(bot, new GoalNearXZ(p.x + (Math.random() * 10 - 5), p.z + (Math.random() * 10 - 5), 1), 15000).catch(() => {});
+            if (!spot) continue;
+            spot = _V_placeSpot(bot, tried);
+            if (!spot) continue;
         }
         try {
             await bot.equip(item, "hand");
@@ -222,6 +228,7 @@ async function _V_placeStation(bot, name) {
             bot.save(`${name}_placed`);
             return b;
         }
+        tried.add(spot.pos.toString());
     }
     return null;
 }
