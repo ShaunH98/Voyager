@@ -467,7 +467,62 @@ function _V_need(bot, bp, O) {
     return need;
 }
 
+// a full inventory can't pick up what we gather (the collector then looks for a chest and fails):
+// put junk in a dump chest (one we carry, or one made from our planks), keeping enough fill blocks
+// for this build. Dropping is the last resort: the bot walks over the items and picks them up again.
+async function _V_makeRoom(bot, need, slots = 4) {
+    if (bot.inventory.emptySlotCount() >= slots) return;
+    const junk = (n) => _V_JUNK.includes(n) || n.endsWith("_sapling") || n.endsWith("_tulip");
+    const plan = () => {
+        let fillLeft = _V_haveFor(bot, "fill") - (need.fill || 0);
+        const out = [];
+        for (const it of bot.inventory.items().filter((i) => junk(i.name)).sort((x, y) => x.count - y.count)) {
+            if (_V_FILL_ITEMS.includes(it.name)) {
+                if (fillLeft < it.count) continue;
+                fillLeft -= it.count;
+            }
+            out.push(it);
+        }
+        return out;
+    };
+    if (!plan().length) {
+        bot.chat("Inventory is nearly full and I carry no junk to get rid of");
+        return;
+    }
+    const stored = {};
+    if (!_V_has(bot, "chest") && _V_haveFor(bot, "planks") >= 8 + (need.planks || 0)) {
+        try { await obtainItem(bot, "chest", 1); } catch (e) { /* best effort */ }
+    }
+    if (_V_has(bot, "chest")) {
+        const block = await _V_placeStation(bot, "chest");
+        if (block) {
+            try {
+                const c = await bot.openContainer(block);
+                for (const it of plan()) {
+                    try {
+                        await c.deposit(it.type, null, it.count);
+                        stored[it.name] = (stored[it.name] || 0) + it.count;
+                    } catch (e) { /* chest full */ }
+                }
+                c.close();
+                await bot.waitForTicks(4);
+            } catch (e) { /* could not open */ }
+            if (Object.keys(stored).length) bot.chat(`Put ${Object.entries(stored).map(([n, c]) => c + " " + n).join(", ")} in a chest at ${block.position} to make room`);
+        }
+    }
+    const dropped = {};
+    for (const it of plan()) {
+        if (bot.inventory.emptySlotCount() >= slots) break;
+        try {
+            await bot.tossStack(it);
+            dropped[it.name] = (dropped[it.name] || 0) + it.count;
+        } catch (e) { /* stack moved; skip */ }
+    }
+    if (Object.keys(dropped).length) bot.chat(`Dropped ${Object.entries(dropped).map(([n, c]) => c + " " + n).join(", ")} to make room`);
+}
+
 async function _V_gatherFor(bot, need) {
+    await _V_makeRoom(bot, need);
     for (const [k, n] of Object.entries(need)) {
         if (k === "hoe") {
             if (!bot.inventory.items().some((i) => i.name.endsWith("_hoe")) && !(await obtainItem(bot, "wooden_hoe", 1))) return false;
@@ -481,9 +536,11 @@ async function _V_gatherFor(bot, need) {
         if (k === "fill") have += Math.max(0, _V_haveFor(bot, "wall") - (need.wall || 0)); // spare stone fills holes too
         if (have >= n) continue;
         const name = _V_obtainNameFor(bot, k);
+        // the pathfinder spends cobblestone as scaffolding on the way, so bring spare wall stone
+        const extra = k === "wall" ? 8 : 0;
         bot.chat(`Gathering ${n - have} ${k === "fill" ? "dirt" : k} for building`);
-        const ok = await obtainItem(bot, name, _V_count(bot, name) + (n - have));
-        if (!ok && k !== "torch") {
+        const ok = await obtainItem(bot, name, _V_count(bot, name) + (n - have) + extra);
+        if (!ok && k !== "torch" && _V_haveFor(bot, k) < n) {
             bot.chat(`Not enough ${k} to build`);
             return false;
         }
