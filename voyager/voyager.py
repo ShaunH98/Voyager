@@ -502,6 +502,12 @@ class Voyager:
         cur.base_note = self._base_summary()
         inv_used = self.last_events[-1][1]["status"]["inventoryUsed"] if self.last_events else 0
         has_home = any(s.get("type") == "hut" and s.get("ok") for s in (self.base or {}).get("structures", []))
+        if not has_home and inv_used >= 30 and cur.failed_tasks.count("Build a home") < 2:
+            # a full inventory is the classic reason to settle down: build a home, then store things there
+            return "Build a home", (
+                f"My inventory has {inv_used}/36 slots used and I have no home to store things in. "
+                "Call `await buildHome(bot);` to build a stone cottage with a bed and chest nearby; it gathers its own materials."
+            )
         if has_home and inv_used >= 30 and cur.failed_tasks.count("Store items at home") < 2:
             return "Store items at home", (
                 f"My inventory has {inv_used}/36 slots used. Call `await storeItems(bot);` to take junk and "
