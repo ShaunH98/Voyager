@@ -64,7 +64,7 @@ def main():
                 out = r.cmd("list")
                 names = out.split(":", 1)[1] if ":" in out else ""
                 for name in [n.strip() for n in names.split(",") if n.strip()]:
-                    if name != BOT and name not in done:
+                    if name != BOT and not name.endswith("bot") and name not in done:  # test bots stay players
                         r.cmd(f"op {name}")
                         r.cmd(f"gamemode spectator {name}")
                         r.cmd(f"tp {name} {BOT}")

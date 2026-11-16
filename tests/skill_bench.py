@@ -93,7 +93,7 @@ def main():
     programs = "\n\n".join(list(library.values()) + load_control_primitives())
     tasks = [t for t in TASKS if not args.only or t["id"] in args.only.split(",")]
 
-    env = VoyagerEnv(mc_port=args.mc_port, server_port=args.server_port, request_timeout=args.timeout,
+    env = VoyagerEnv(mc_port=args.mc_port, server_port=args.server_port, request_timeout=args.timeout, username="benchbot",
                      log_path=str(ROOT / "logs" / "bench"))
     results = []
     try:
